@@ -15,7 +15,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".RouteDetail"></activity>
+        <activity android:name=".RouteDetail"
+            android:label="Route detail"
+            android:parentActivityName=".RouteActivity"></activity>
         <activity
             android:name=".RouteActivity"
             android:label="@string/title_activity_route"
