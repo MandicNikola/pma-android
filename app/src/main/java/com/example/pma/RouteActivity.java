@@ -51,11 +51,12 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
                 builder.setMessage("Do you want to start new route?");
 
                 builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-
+                    /* start active route for now */
                     public void onClick(DialogInterface dialog, int which) {
                         // Do nothing but close the dialog
-
+                        Intent intent = new Intent(RouteActivity.this, ActiveRoute.class);
                         dialog.dismiss();
+                        startActivity(intent);
                     }
                 });
 

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
@@ -14,17 +15,13 @@
         android:orientation="vertical"
         android:padding="0dp">
 
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:map="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+        <com.mapbox.mapboxsdk.maps.MapView
+            android:id="@+id/mapView"
             android:layout_width="match_parent"
             android:layout_height="400dp"
-            android:layout_marginBottom="20dp"
-            tools:context=".RouteDetail">
-
-        </fragment>
+            mapbox:mapbox_cameraTargetLat="45.5076"
+            mapbox:mapbox_cameraTargetLng="-122.6736"
+            mapbox:mapbox_cameraZoom="11" />
 
         <TextView
             android:id="@+id/route_header"
