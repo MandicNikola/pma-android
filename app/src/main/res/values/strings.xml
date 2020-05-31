@@ -15,14 +15,6 @@
     <string name="gender">Gender</string>
     <string name="units">Units</string>
     <string name="reminder">Water reminder</string>
-    <string-array name="gender_array">
-        <item>Male</item>
-        <item>Female</item>
-    </string-array>
-    <string-array name="unit_array">
-        <item>Metric</item>
-        <item>Imperial</item>
-    </string-array>
     <string name="title_activity_route">RouteActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -30,10 +22,21 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
-
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
 
+    <string name="menu_slideshow">Slideshow</string>
     <string name="home_second">Home Second</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoibWFuZGF1bnMiLCJhIjoiY2thdGpoem9wMHU3OTJ1b2N2djU2bWo2eCJ9.WiHV5bEzANKqwbfVwbJnNQ</string>
+
+    <string-array name="gender_array">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+
+    <!-- Mapbox access token -->
+    <string-array name="unit_array">
+        <item>Metric</item>
+        <item>Imperial</item>
+    </string-array>
 </resources>
