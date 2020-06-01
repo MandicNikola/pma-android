@@ -13,14 +13,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ProfileActivity"></activity>
+        <activity android:name=".ProfileActivity"
+            android:label="My Profile"
+            android:parentActivityName=".RouteActivity"></activity>
         <activity android:name=".ActiveRoute" />
         <activity
             android:name=".CreateGoalActivity"
             android:label="New goal"
             android:parentActivityName=".GoalActivity" />
         <activity android:name=".GoalActivity" />
-        <activity android:name=".SettingsActivity" />
+        <activity android:name=".SettingsActivity"
+            android:label="Settings"
+            android:parentActivityName=".RouteActivity" />
         <activity
             android:name=".RouteDetail"
             android:label="Route detail"

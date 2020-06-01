@@ -8,13 +8,13 @@
     android:orientation="vertical"
     android:padding="20dp"
     tools:context=".SettingsActivity">
+
     <LinearLayout
+        android:layout_width="214dp"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:background="#FFFFFF"
-        android:layout_height="match_parent"
-        android:layout_width="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/logoImg"
@@ -45,14 +45,15 @@
                 android:id="@+id/name_data"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:hint="185"
                 android:inputType="textPersonName"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
-                android:layout_weight="1"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,11 +75,11 @@
                 android:id="@+id/surname_data"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:hint="185"
                 android:inputType="textPersonName"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
-                android:layout_weight="1"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp" />
         </LinearLayout>
@@ -104,11 +105,11 @@
                 android:id="@+id/email_data"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:hint="185"
                 android:inputType="textPersonName"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
-                android:layout_weight="1"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp" />
         </LinearLayout>
@@ -123,10 +124,10 @@
                 android:id="@+id/height_label"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
-                android:layout_weight="1"
                 android:paddingBottom="5dp"
                 android:text="@string/height" />
 
@@ -134,11 +135,11 @@
                 android:id="@+id/height_data"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:hint="185"
                 android:inputType="textPersonName"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
-                android:layout_weight="1"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp" />
         </LinearLayout>
@@ -153,9 +154,9 @@
                 android:id="@+id/weight_label"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
-                android:layout_weight="1"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp"
                 android:text="@string/weight" />
@@ -164,8 +165,8 @@
                 android:id="@+id/weight_data"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:hint="85"
                 android:layout_weight="1"
+                android:hint="85"
                 android:inputType="textPersonName"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
@@ -178,21 +179,23 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/gender_label"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
-                android:layout_weight="1"
                 android:paddingBottom="5dp"
                 android:text="@string/gender" />
+
             <Spinner
                 android:id="@+id/gender_spinner"
-                android:layout_weight="1"
                 android:layout_width="150dp"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
         </LinearLayout>
 
         <LinearLayout
@@ -204,18 +207,18 @@
                 android:id="@+id/unit_label"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
-                android:layout_weight="1"
                 android:paddingBottom="5dp"
                 android:text="@string/units" />
 
             <Spinner
                 android:id="@+id/unit_spinner"
-                android:layout_weight="1"
                 android:layout_width="150dp"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
         </LinearLayout>
 
         <Button

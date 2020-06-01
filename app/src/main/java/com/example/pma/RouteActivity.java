@@ -145,6 +145,10 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
             Intent intent = new Intent(RouteActivity.this, GoalActivity.class);
             startActivity(intent);
         }
+        if(id == R.id.nav_profile){
+            Intent intent = new Intent(RouteActivity.this, ProfileActivity.class);
+            startActivity(intent);
+        }
 
         if(id == R.id.nav_settings){
             Intent intent = new Intent(RouteActivity.this, SettingsActivity.class);
