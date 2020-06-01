@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,9 +16,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -56,7 +57,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     private LocationManager locationManager;
 
-
+    // coordinates of map center
+    private Double lat;
+    private Double lng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,12 +68,13 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
         setContentView(R.layout.activity_active_route);
 
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-
+        /* location manager init flow */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{
@@ -82,20 +86,30 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 1, this);
 
-        Log.d("AAAA", String.valueOf(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude()));
+        lat = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
+        lng = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
+
+        // init first point of map
+        points.add(Point.fromLngLat(lng, lat));
+
     }
 
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
+
+        double initLat = lat != null ? lat : 45.2671;
+        double initLng = lng != null ? lng : 19.83;
+
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(45.2671, 19.83))
-                .zoom(13)
+                .target(new LatLng(initLat, initLng))
+                .zoom(15)
                 .build();
         mapboxMap.setCameraPosition(cameraPosition);
         mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
             LineString lineString = LineString.fromLngLats(points);
             Feature feature = Feature.fromGeometry(lineString);
+            // line init flow
             style.addSource(new GeoJsonSource("line-source", feature));
 
             style.addLayer(new LineLayer("linelayer", "line-source")
@@ -104,6 +118,25 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                             PropertyFactory.lineOpacity(.7f),
                             PropertyFactory.lineWidth(7f),
                             PropertyFactory.lineColor(Color.parseColor("#3bb2d0"))));
+
+
+            // marker init flow
+            style.addImage(DOT_SOURCE_ID, BitmapFactory.decodeResource(getResources(), R.drawable.blue_marker));
+
+            List<Feature> iconFeatureList = new ArrayList<>();
+            iconFeatureList.add(Feature.fromGeometry(Point.fromLngLat(initLng, initLat)));
+
+            style.addSource(new GeoJsonSource("dot-source", FeatureCollection.fromFeatures(iconFeatureList)));
+
+            style.addLayer(new SymbolLayer("dot-layer", "dot-source")
+                .withProperties(
+                        iconImage(DOT_SOURCE_ID),
+                        iconAllowOverlap(true),
+                        iconIgnorePlacement(true),
+                        iconSize(0.5f)
+                )
+            );
+
         });
     }
 
@@ -123,9 +156,25 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 }
                 locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 1, this);
+                lat = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
+                lng = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
+                initMapCenter();
                 break;
             default:
                 break;
+        }
+    }
+
+    private void initMapCenter() {
+        if(mapboxMap != null) {
+            double initLat = lat != null ? lat : 45.2671;
+            double initLng = lng != null ? lng : 19.83;
+
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(new LatLng(initLat, initLng))
+                    .zoom(15)
+                    .build();
+            mapboxMap.setCameraPosition(cameraPosition);
         }
     }
 
@@ -192,6 +241,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 Feature feature = Feature.fromGeometry(lineString);
                 source.setGeoJson(feature);
 
+                // update icon
+                source = style.getSourceAs("dot-source");
+                source.setGeoJson(Feature.fromGeometry(Point.fromLngLat(location.getLongitude(), location.getLatitude())));
             });
         }
     }
@@ -210,6 +262,14 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onProviderDisabled(String provider) {
         Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivity(intent);
+    }
+
+    // handle when route is finished
+    // TODO: put route in DB
+    public void onFinishClick(View view) {
+        locationManager.removeUpdates(this);
+        Intent intent = new Intent(this, RouteActivity.class);
         startActivity(intent);
     }
 }
