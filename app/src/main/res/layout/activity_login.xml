@@ -51,7 +51,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="15dp"
             android:background="@drawable/custom_btn"
-            android:onClick="navigateRoutes"
+            android:onClick="checkData"
             android:paddingLeft="40dp"
             android:paddingRight="40dp"
             android:text="@string/login" />

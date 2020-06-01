@@ -10,6 +10,7 @@
     <string name="smith">Smith</string>
     <string name="john">John</string>
     <string name="name">Name</string>
+    <string name="mail">Email</string>
     <string name="height">Height[cm]</string>
     <string name="weight">Weight[kg]</string>
     <string name="gender">Gender</string>
