@@ -2,15 +2,23 @@ package com.example.pma;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.example.pma.dialogues.MessageDialogue;
 import com.example.pma.model.User;
 import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
+
+import java.util.HashMap;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,19 +56,103 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if(response.isSuccessful()){
-                    Log.d(TAG,"Registration successfull "+response.code());
-                    Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
-                    startActivity(intent);
+                    if(response.code() == 200) {
+                    /*
+                    CharSequence mess = "Registration successfull "+response.code()+ " " + response.message();
+                    Context context = getApplicationContext();
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, mess, duration);
+                    toast.show();
+                    */
+
+                        Log.d(TAG, "Registration successfull " + response.code() + " " + response.message());
+                        MessageDialogue dialog = new MessageDialogue("You have successfully registered", "Notification");
+                        dialog.show(getSupportFragmentManager(), "example dialog");
+
+                        new Handler().postDelayed(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                // your code to start second activity. Will wait for 3 seconds before calling this method
+                                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                                startActivity(intent);
+
+                            }
+                        }, 2000);
+                    }
                 }else{
-                    Log.d(TAG,"Unsuccessfull registration"+response.code());
+                    if(response.code() == 406){
+                        CharSequence mess = "Registration usuccessfull "+response.code();
+                        Context context = getApplicationContext();
+                        int duration = Toast.LENGTH_SHORT;
+                        Toast toast = Toast.makeText(context, mess, duration);
+                        toast.show();
+                    }else {
+                        Log.d(TAG, "Unsuccessfull registration" + response.code());
+                        MessageDialogue dialog = new MessageDialogue("You are not successfully registered" + response.code(), "Notification");
+                        dialog.show(getSupportFragmentManager(), "example dialog");
+                    }
                 }
 
             }
 
             @Override
             public void onFailure(Call<UserResponse> call, Throwable t) {
-                Log.d(TAG,"fail registration");
+                Log.d(TAG,"Registration failed");
             }
         });
+    }
+
+    public void checkData(View view) {
+        boolean checkFlag = false;
+        if(isEmpty((EditText)findViewById(R.id.firstName))){
+            ((EditText) findViewById(R.id.firstName)).setError("First name is required.");
+            checkFlag = true;
+        }
+        if(isEmpty((EditText)findViewById(R.id.lastName))) {
+            ((EditText) findViewById(R.id.lastName)).setError("Last name is required.");
+            checkFlag = true;
+        }
+        if(isEmpty((EditText)findViewById(R.id.username))) {
+            ((EditText) findViewById(R.id.username)).setError("Username is required.");
+            checkFlag = true;
+        }
+        if(isEmpty((EditText)findViewById(R.id.email))) {
+            ((EditText) findViewById(R.id.email)).setError("Email is required.");
+            checkFlag = true;
+        }else{
+            if(!isEmail((EditText)findViewById(R.id.email))){
+                ((EditText) findViewById(R.id.email)).setError("Email is not valid.");
+                checkFlag = true;
+            }
+        }
+        if(isEmpty((EditText)findViewById(R.id.password))) {
+            ((EditText) findViewById(R.id.password)).setError("Password is required.");
+            checkFlag = true;
+        }else if(isNotPassword((EditText)findViewById(R.id.password))){
+            ((EditText) findViewById(R.id.password)).setError("Password must be at least 8 characters long.");
+            checkFlag = true;
+
+        }
+        if(!checkFlag){
+            registerUser(view);
+        }
+
+    }
+    public boolean isEmpty(EditText text){
+        CharSequence str = text.getText().toString();
+        return TextUtils.isEmpty(str);
+    }
+    public boolean isEmail(EditText text) {
+        CharSequence email = text.getText().toString();
+        return (!TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches());
+    }
+    public boolean isNotPassword(EditText text){
+        CharSequence password = text.getText().toString();
+        if(password.toString().length() < 8 ){
+          return true;
+        }
+        return  false;
     }
 }
