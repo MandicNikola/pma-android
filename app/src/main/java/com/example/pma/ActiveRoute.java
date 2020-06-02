@@ -36,7 +36,11 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
@@ -54,6 +58,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     /** `array` of route points */
     private List points = new ArrayList<Point>();
+
+    // hashmap of point history
+    private HashMap<String, List<Double>> pointHistory = new HashMap<>();
 
     private LocationManager locationManager;
 
@@ -85,12 +92,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             }
         }
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 1, this);
-
-        lat = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
-        lng = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
-
-        // init first point of map
-        points.add(Point.fromLngLat(lng, lat));
 
     }
 
@@ -145,13 +146,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         switch (requestCode) {
             case 10:
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
                     return;
                 }
                 locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -223,18 +217,28 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onLocationChanged(Location location) {
-        String message = new StringBuilder()
-                .append("latitude: ")
-                .append(location.getLatitude())
-                .append("\t")
-                .append("longitude: ")
-                .append(location.getLongitude())
-                .toString();
-        Log.d("AAA", message);
-        Toast.makeText(ActiveRoute.this, message, Toast.LENGTH_SHORT).show();
-        points.add(Point.fromLngLat(location.getLongitude(), location.getLatitude()));
+
+        Double lng = location.getLongitude();
+        Double lat = location.getLatitude();
+
+        points.add(Point.fromLngLat(lng, lat));
+
+        // putting points in hashmap, to save them later in DB
+        String pointDate = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss").format(new Date(location.getTime()));
+        Toast.makeText(this, pointDate, Toast.LENGTH_SHORT).show();
+        pointHistory.put(pointDate, new ArrayList<>(Arrays.asList(lat, lng)));
+        // TODO: ADD speed calculation
+
+
         if(mapboxMap != null) {
-            Log.d("AAAA", "ISCRTAVA");
+            // start route to track, now move to the center
+            if(points.size() == 1) {
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(lat, lng))
+                        .zoom(15)
+                        .build();
+                mapboxMap.setCameraPosition(cameraPosition);
+            }
             mapboxMap.getStyle( style -> {
                 GeoJsonSource source = style.getSourceAs("line-source");
                 LineString lineString = LineString.fromLngLats(points);
