@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -13,7 +14,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.pma.database.DatabaseHelperRoute;
+import com.example.pma.database.DatabaseManagerRoute;
 import com.example.pma.dialogues.MessageDialogue;
+import com.example.pma.model.Route;
 import com.example.pma.model.User;
 import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
@@ -30,6 +34,9 @@ public class RegisterActivity extends AppCompatActivity {
     private static final String TAG = "RegisterActivity";
     private Retrofit retrofit;
     private AuthPlaceholder service;
+    //za testiranje baze
+    private DatabaseManagerRoute dbManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +46,38 @@ public class RegisterActivity extends AppCompatActivity {
                 .baseUrl("https://pma-app-19.herokuapp.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+        //za testiranje baze
+        dbManager = new DatabaseManagerRoute(this);
+        dbManager.open();
 
     }
+    //za testiranje baze
 
+    public void testDatabase(View view) {
+        dbManager.insert(32,22,"bla");
+        testInsert();
+    }
+    public void testInsert(){
+
+        Cursor cursor = dbManager.fetch();
+        cursor.moveToFirst();
+        //index krece od 1
+        CharSequence mess = "Unos goal "+cursor.getString(2);
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, mess, duration);
+        toast.show();
+    }
+    public void testUpdate(View w){
+        Cursor c = dbManager.testQuery();
+           String column1 = c.getString(0);
+                CharSequence mess = "Update goal " + column1;
+                Context context = getApplicationContext();
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, mess, duration);
+                toast.show();
+
+    }
     public void registerUser(View view) {
         service = retrofit.create(AuthPlaceholder.class);
         String userName = ((EditText)findViewById(R.id.firstName)).getText().toString();
@@ -57,14 +93,6 @@ public class RegisterActivity extends AppCompatActivity {
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if(response.isSuccessful()){
                     if(response.code() == 200) {
-                    /*
-                    CharSequence mess = "Registration successfull "+response.code()+ " " + response.message();
-                    Context context = getApplicationContext();
-                    int duration = Toast.LENGTH_SHORT;
-
-                    Toast toast = Toast.makeText(context, mess, duration);
-                    toast.show();
-                    */
 
                         Log.d(TAG, "Registration successfull " + response.code() + " " + response.message());
                         MessageDialogue dialog = new MessageDialogue("You have successfully registered", "Notification");
