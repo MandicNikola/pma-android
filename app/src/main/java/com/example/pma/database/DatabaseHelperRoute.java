@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelperRoute extends SQLiteOpenHelper {
     //Table name
-    public static final String TABLE_NAME = "COUNTRIES";
+    public static final String TABLE_NAME = "ROUTES";
     //Table Columns
     public static final String _ID = "_id";
     public static final String CALORIES = "calories";
