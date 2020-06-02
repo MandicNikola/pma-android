@@ -229,7 +229,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         pointHistory.put(pointDate, new ArrayList<>(Arrays.asList(lat, lng)));
         // TODO: ADD speed calculation
 
-
+        // TODO: ADD calories calculation, need to extract settings from user
         if(mapboxMap != null) {
             // start route to track, now move to the center
             if(points.size() == 1) {
