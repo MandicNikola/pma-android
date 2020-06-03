@@ -58,15 +58,24 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     /** `array` of route points */
     private List points = new ArrayList<Point>();
-
-    // hashmap of point history
-    private HashMap<String, List<Double>> pointHistory = new HashMap<>();
+    // TODO: Use them for memorizing
+    /** `array` list from locations, later use them for memorizing to DB */
+    private List locations = new ArrayList<Location>();
 
     private LocationManager locationManager;
+
+    // distance calculated for route
+    private Float distance = 0f;
+    // calories calculated for route
+    private Double calories = 0.0;
 
     // coordinates of map center
     private Double lat;
     private Double lng;
+
+    // TODO: Later when get user settings need to provide those values from DB
+    private double height = 192;
+    private double weight = 105;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,8 +100,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 return;
             }
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 1, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2500, 1, this);
 
+        // TODO: Need to get userSettings because need for user weight and height
     }
 
     @Override
@@ -149,7 +159,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                     return;
                 }
                 locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 1, this);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2500, 1, this);
                 lat = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
                 lng = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
                 initMapCenter();
@@ -170,6 +180,34 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                     .build();
             mapboxMap.setCameraPosition(cameraPosition);
         }
+    }
+
+    private void calculateValues(Location location) {
+        Double lat = location.getLatitude();
+        Double lng = location.getLongitude();
+
+        if(locations.size() >= 1) {
+            // get last point
+            Location previousLocation = (Location) locations.get(locations.size() - 1);
+            float[] calculatedDistance = new float[2];
+
+            Location.distanceBetween(lat, lng, previousLocation.getLatitude(), previousLocation.getLongitude(), calculatedDistance);
+            this.distance += calculatedDistance[0];
+            float timeDifference = ((location.getTime() - previousLocation.getTime()) / 1000);
+            float speed = calculatedDistance[0] / timeDifference;
+            this.calories += ((0.035 * weight) + (Math.pow(speed, 2) / height)*(0.029 * weight)) * (timeDifference / 60);
+
+            String message = new StringBuilder()
+                    .append("Calories: ")
+                    .append(this.calories)
+                    .append(" cal \n")
+                    .append("Distance: ")
+                    .append(this.distance)
+                    .append(" m")
+                    .toString();
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
+        locations.add(location);
     }
 
     @Override
@@ -223,12 +261,8 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
         points.add(Point.fromLngLat(lng, lat));
 
-        // putting points in hashmap, to save them later in DB
-        String pointDate = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss").format(new Date(location.getTime()));
-        Toast.makeText(this, pointDate, Toast.LENGTH_SHORT).show();
-        pointHistory.put(pointDate, new ArrayList<>(Arrays.asList(lat, lng)));
         // TODO: ADD speed calculation
-
+        calculateValues(location);
         // TODO: ADD calories calculation, need to extract settings from user
         if(mapboxMap != null) {
             // start route to track, now move to the center
