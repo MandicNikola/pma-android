@@ -8,6 +8,8 @@ public class Route implements Parcelable {
     private int calories;
     private int distance;
     private String unit;
+    private long synchronized_id;
+
 
     public Route() {
 
@@ -63,6 +65,14 @@ public class Route implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
+    }
+
+    public long getSynchronized_id() {
+        return synchronized_id;
+    }
+
+    public void setSynchronized_id(long synchronized_id) {
+        this.synchronized_id = synchronized_id;
     }
 
     @Override
