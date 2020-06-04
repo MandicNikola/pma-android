@@ -25,19 +25,12 @@
         android:background="#FFFFFF"
         android:orientation="vertical"
         android:padding="0dp">
-    <Button
-        android:id="@+id/finishBtn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:onClick="onFinishClick"
-        android:text="Finish" />
 
 
         <LinearLayout android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/layout_bg"
             android:orientation="horizontal">
 
@@ -68,7 +61,7 @@
         <LinearLayout android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/layout_bg"
             android:orientation="horizontal">
 
@@ -96,6 +89,14 @@
                 android:paddingBottom="5dp"
                 android:textColor="@color/white"/>
         </LinearLayout>
-
+        <Button
+            android:id="@+id/finishBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_shape"
+            android:textColor="@color/white"
+            android:layout_marginTop="10dp"
+            android:onClick="onFinishClick"
+            android:text="Finish" />
     </LinearLayout>
     </LinearLayout>
