@@ -42,7 +42,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/distance"
+                android:id="@+id/calories"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -55,7 +55,7 @@
                 android:textStyle="italic" />
 
             <TextView
-                android:id="@+id/distance_value"
+                android:id="@+id/calories_value"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -73,7 +73,7 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/calories"
+                android:id="@+id/distance"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -86,7 +86,7 @@
                 android:textStyle="italic" />
 
             <TextView
-                android:id="@+id/calories_value"
+                android:id="@+id/distance_value"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
