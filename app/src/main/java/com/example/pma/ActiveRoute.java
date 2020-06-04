@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mapbox.geojson.Feature;
@@ -35,6 +36,8 @@ import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -73,6 +76,8 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     private Double lat;
     private Double lng;
 
+    private TextView distanceValueView;
+    private TextView caloriesValueView;
     // TODO: Later when get user settings need to provide those values from DB
     private double height = 192;
     private double weight = 105;
@@ -81,8 +86,12 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
-
         setContentView(R.layout.activity_active_route);
+        distanceValueView = (TextView)findViewById(R.id.distance_value);
+        distanceValueView.setText("0 m");
+        caloriesValueView = (TextView)findViewById(R.id.calories_value);
+        caloriesValueView.setText("0 cal");
+
 
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
@@ -197,6 +206,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             float speed = calculatedDistance[0] / timeDifference;
             this.calories += ((0.035 * weight) + (Math.pow(speed, 2) / height)*(0.029 * weight)) * (timeDifference / 60);
 
+           distanceValueView.setText(this.distance + " m");
+           caloriesValueView.setText(this.calories+" cal");
+
             String message = new StringBuilder()
                     .append("Calories: ")
                     .append(this.calories)
@@ -207,6 +219,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                     .toString();
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         }
+
         locations.add(location);
     }
 
