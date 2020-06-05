@@ -7,7 +7,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
 public class DatabaseManagerRoute {
-    private DatabaseHelperRoute dbHelper;
+    private DatabaseHelper dbHelper;
     private Context context;
     private SQLiteDatabase database;
 
@@ -15,7 +15,7 @@ public class DatabaseManagerRoute {
         this.context = c;
     }
     public  DatabaseManagerRoute open() throws SQLException {
-        dbHelper = new DatabaseHelperRoute(context);
+        dbHelper = new DatabaseHelper(context);
         database = dbHelper.getWritableDatabase();
         return  this;
     }
@@ -25,14 +25,14 @@ public class DatabaseManagerRoute {
 
     public void insert(int calories,int distance,String unit){
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelperRoute.CALORIES,calories);
-        contentValues.put(DatabaseHelperRoute.DISTANCE,distance);
-        contentValues.put(DatabaseHelperRoute.UNIT,unit);
-        database.insert(DatabaseHelperRoute.TABLE_NAME, null, contentValues);
+        contentValues.put(DatabaseHelper.CALORIES,calories);
+        contentValues.put(DatabaseHelper.DISTANCE,distance);
+        contentValues.put(DatabaseHelper.UNIT,unit);
+        database.insert(DatabaseHelper.TABLE_ROUTES, null, contentValues);
     }
     public Cursor fetch(){
-        String[] columns  = new String[]{DatabaseHelperRoute._ID, DatabaseHelperRoute.CALORIES,DatabaseHelperRoute.DISTANCE,DatabaseHelperRoute.UNIT};
-        Cursor cursor = database.query(DatabaseHelperRoute.TABLE_NAME, columns, null,null,null,null,null);
+        String[] columns  = new String[]{DatabaseHelper._ID, DatabaseHelper.CALORIES,DatabaseHelper.DISTANCE,DatabaseHelper.UNIT};
+        Cursor cursor = database.query(DatabaseHelper.TABLE_ROUTES, columns, null,null,null,null,null);
         if(cursor != null){
             cursor.moveToFirst();
         }
@@ -41,18 +41,18 @@ public class DatabaseManagerRoute {
     }
     public int update(long id,int calories,int distance,String unit){
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelperRoute.CALORIES,calories);
-        contentValues.put(DatabaseHelperRoute.DISTANCE,distance);
-        contentValues.put(DatabaseHelperRoute.UNIT,unit);
-        int i = database.update(DatabaseHelperRoute.TABLE_NAME,contentValues,DatabaseHelperRoute._ID + " = "+id,null);
+        contentValues.put(DatabaseHelper.CALORIES,calories);
+        contentValues.put(DatabaseHelper.DISTANCE,distance);
+        contentValues.put(DatabaseHelper.UNIT,unit);
+        int i = database.update(DatabaseHelper.TABLE_ROUTES,contentValues,DatabaseHelper._ID + " = "+id,null);
         return i ;
     }
     public  void delete(long id){
-        database.delete(DatabaseHelperRoute.TABLE_NAME,DatabaseHelperRoute._ID+" = "+ id,null);
+        database.delete(DatabaseHelper.TABLE_ROUTES,DatabaseHelper._ID+" = "+ id,null);
     }
     public Cursor testQuery(){
 
-        Cursor res = database.rawQuery( "select "+DatabaseHelperRoute._ID+" from "+DatabaseHelperRoute.TABLE_NAME, null );
+        Cursor res = database.rawQuery( "select "+DatabaseHelper._ID+" from "+DatabaseHelper.TABLE_ROUTES, null );
         res.moveToFirst();
         return res;
     }

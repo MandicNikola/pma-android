@@ -27,14 +27,22 @@
     <string name="menu_gallery">Gallery</string>
     <string name="calories">Calories</string>
     <string name="distance">Distance</string>
+    <string name="challenge">Challenge</string>
+    <string name="goal">Goal</string>
 
     <string name="menu_slideshow">Slideshow</string>
     <string name="home_second">Home Second</string>
     <string name="mapbox_access_token">pk.eyJ1IjoibWFuZGF1bnMiLCJhIjoiY2thdGpoem9wMHU3OTJ1b2N2djU2bWo2eCJ9.WiHV5bEzANKqwbfVwbJnNQ</string>
+    <string name="create">Create</string>
+    <string name="chooseDeadline">Choose a deadline</string>
 
     <string-array name="gender_array">
         <item>Male</item>
         <item>Female</item>
+    </string-array>
+    <string-array name="challenge_array">
+        <item>Calories</item>
+        <item>Distance</item>
     </string-array>
 
     <!-- Mapbox access token -->
@@ -42,4 +50,7 @@
         <item>Metric</item>
         <item>Imperial</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

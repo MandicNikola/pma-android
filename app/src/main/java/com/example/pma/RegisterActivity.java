@@ -14,15 +14,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.pma.database.DatabaseHelperRoute;
 import com.example.pma.database.DatabaseManagerRoute;
 import com.example.pma.dialogues.MessageDialogue;
-import com.example.pma.model.Route;
 import com.example.pma.model.User;
 import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
-
-import java.util.HashMap;
 
 import retrofit2.Call;
 import retrofit2.Callback;

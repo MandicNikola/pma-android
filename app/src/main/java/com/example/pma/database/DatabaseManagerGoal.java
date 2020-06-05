@@ -9,15 +9,17 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.Date;
 
 public class DatabaseManagerGoal {
-    private DatabaseHelperGoal dbHelper;
+    private DatabaseHelper dbHelper;
     private Context context;
     private SQLiteDatabase database;
 
     public DatabaseManagerGoal(Context c){
         this.context = c;
     }
+
     public  DatabaseManagerGoal open() throws SQLException {
-        dbHelper = new DatabaseHelperGoal(context);
+        dbHelper = new DatabaseHelper(context);
+
         database = dbHelper.getWritableDatabase();
         return  this;
     }
@@ -26,36 +28,36 @@ public class DatabaseManagerGoal {
 
     }
 
-    public void insert(String key, double value, String date){
+    public void insert(String key, int value, String date){
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelperGoal.KEY, key);
-        contentValues.put(DatabaseHelperGoal.VALUE, value);
-        contentValues.put(DatabaseHelperGoal.DATE, date);
-        database.insert(DatabaseHelperGoal.TABLE_NAME, null, contentValues);
+        contentValues.put(DatabaseHelper.KEY, key);
+        contentValues.put(DatabaseHelper.VALUE, value);
+        contentValues.put(DatabaseHelper.DATE, date);
+        database.insert(DatabaseHelper.TABLE_GOALS, null, contentValues);
     }
     public Cursor fetch(){
-        String[] columns  = new String[]{DatabaseHelperGoal._ID, DatabaseHelperGoal.KEY,DatabaseHelperGoal.VALUE,DatabaseHelperGoal.DATE};
-        Cursor cursor = database.query(DatabaseHelperGoal.TABLE_NAME, columns, null,null,null,null,null);
+        String[] columns  = new String[]{DatabaseHelper._ID, DatabaseHelper.KEY,DatabaseHelper.VALUE,DatabaseHelper.DATE};
+        Cursor cursor = database.query(DatabaseHelper.TABLE_GOALS, columns, null,null,null,null,null);
         if(cursor != null){
             cursor.moveToFirst();
         }
         return  cursor;
 
     }
-    public int update(long id, String key, double value, String date){
+    public int update(long id, String key, int value, String date){
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelperGoal.KEY, key);
-        contentValues.put(DatabaseHelperGoal.VALUE, value);
-        contentValues.put(DatabaseHelperGoal.DATE, date);
-        int i = database.update(DatabaseHelperGoal.TABLE_NAME,contentValues,DatabaseHelperGoal._ID + " = "+id,null);
+        contentValues.put(DatabaseHelper.KEY, key);
+        contentValues.put(DatabaseHelper.VALUE, value);
+        contentValues.put(DatabaseHelper.DATE, date);
+        int i = database.update(DatabaseHelper.TABLE_GOALS,contentValues,DatabaseHelper._ID + " = "+id,null);
         return i ;
     }
     public  void delete(long id){
-        database.delete(DatabaseHelperGoal.TABLE_NAME,DatabaseHelperGoal._ID+" = "+ id,null);
+        database.delete(DatabaseHelper.TABLE_GOALS,DatabaseHelper._ID+" = "+ id,null);
     }
     public Cursor testQuery(){
 
-        Cursor res = database.rawQuery( "select "+DatabaseHelperGoal._ID+" from "+DatabaseHelperGoal.TABLE_NAME, null );
+        Cursor res = database.rawQuery( "select "+DatabaseHelper._ID+" from "+DatabaseHelper.TABLE_GOALS, null );
         res.moveToFirst();
 
 

@@ -22,6 +22,7 @@ public class ProfileActivity extends AppCompatActivity {
         ArrayAdapter adapterGender= new ArrayAdapter(this,android.R.layout.simple_spinner_item, gender_array);
         adapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(adapterGender);
+
         ArrayAdapter adapterUnit= new ArrayAdapter(this,android.R.layout.simple_spinner_item, units_array);
         adapterUnit.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerUnits.setAdapter(adapterUnit);

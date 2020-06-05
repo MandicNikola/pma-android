@@ -10,4 +10,7 @@
     <color name="darkBlue">#1F38DA</color>
     <color name="yellow">#ffff80</color>
     <color name="white">#ffffff</color>
+    <color name="gray">#808080</color>
+    <color name="black">#000000</color>
+
 </resources>
