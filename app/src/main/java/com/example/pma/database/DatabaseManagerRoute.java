@@ -21,7 +21,6 @@ public class DatabaseManagerRoute {
     }
     public void close(){
         dbHelper.close();
-
     }
 
     public void insert(int calories,int distance,String unit){
@@ -55,8 +54,6 @@ public class DatabaseManagerRoute {
 
         Cursor res = database.rawQuery( "select "+DatabaseHelperRoute._ID+" from "+DatabaseHelperRoute.TABLE_NAME, null );
         res.moveToFirst();
-
-
         return res;
     }
 

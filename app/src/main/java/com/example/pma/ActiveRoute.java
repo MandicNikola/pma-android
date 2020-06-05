@@ -10,15 +10,16 @@ import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
+import android.widget.TextView;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.LineString;
@@ -36,20 +37,15 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
-import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 
-public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback, LocationListener {
+public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback {
 
     private MapView mapView;
     private MapboxMap mapboxMap;
@@ -58,28 +54,62 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     /** `array` of route points */
     private List points = new ArrayList<Point>();
+    // TODO: Use them for memorizing
+    /** `array` list from locations, later use them for memorizing to DB */
+    private List locations = new ArrayList<Location>();
 
-    // hashmap of point history
-    private HashMap<String, List<Double>> pointHistory = new HashMap<>();
-
-    private LocationManager locationManager;
+    // distance calculated for route
+    private Float distance = 0f;
+    // calories calculated for route
+    private Double calories = 0.0;
 
     // coordinates of map center
     private Double lat;
     private Double lng;
 
+    private TextView distanceValueView;
+    private TextView caloriesValueView;
+    // TODO: Later when get user settings need to provide those values from DB
+    private double height = 192;
+    private double weight = 105;
+
+    // GOOGLE API LOCATIONS USED FOR APP
+    FusedLocationProviderClient fusedLocationProviderClient;
+
+    LocationCallback locationCallback;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
-
         setContentView(R.layout.activity_active_route);
-
-        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        distanceValueView = (TextView)findViewById(R.id.distance_value);
+        distanceValueView.setText("0 m");
+        caloriesValueView = (TextView)findViewById(R.id.calories_value);
+        caloriesValueView.setText("0 cal");
 
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+            if(location != null) {
+                ActiveRoute.this.lat = location.getLatitude();
+                ActiveRoute.this.lng = location.getLongitude();
+            }
+        });
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                onLocationChanged(locationResult.getLastLocation());
+            }
+        };
+
+        fusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, null);
 
         /* location manager init flow */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -91,8 +121,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 return;
             }
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 1, this);
-
+        // TODO: Need to get userSettings because need for user weight and height
     }
 
     @Override
@@ -125,7 +154,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             style.addImage(DOT_SOURCE_ID, BitmapFactory.decodeResource(getResources(), R.drawable.blue_marker));
 
             List<Feature> iconFeatureList = new ArrayList<>();
-            iconFeatureList.add(Feature.fromGeometry(Point.fromLngLat(initLng, initLat)));
 
             style.addSource(new GeoJsonSource("dot-source", FeatureCollection.fromFeatures(iconFeatureList)));
 
@@ -148,10 +176,24 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     return;
                 }
-                locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 1, this);
-                lat = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
-                lng = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
+                fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+                fusedLocationProviderClient.getLastLocation().addOnSuccessListener(location -> {
+                    if(location != null) {
+                        ActiveRoute.this.lat = location.getLatitude();
+                        ActiveRoute.this.lng = location.getLongitude();
+                    }
+                });
+
+                locationCallback = new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        super.onLocationResult(locationResult);
+                        onLocationChanged(locationResult.getLastLocation());
+                    }
+                };
+
+                fusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, null);
                 initMapCenter();
                 break;
             default:
@@ -170,6 +212,28 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                     .build();
             mapboxMap.setCameraPosition(cameraPosition);
         }
+    }
+
+    private void calculateValues(Location location) {
+        Double lat = location.getLatitude();
+        Double lng = location.getLongitude();
+
+        if(locations.size() >= 1) {
+            // get last point
+            Location previousLocation = (Location) locations.get(locations.size() - 1);
+            float[] calculatedDistance = new float[2];
+
+            Location.distanceBetween(lat, lng, previousLocation.getLatitude(), previousLocation.getLongitude(), calculatedDistance);
+            this.distance += calculatedDistance[0];
+            float timeDifference = ((location.getTime() - previousLocation.getTime()) / 1000);
+            float speed = calculatedDistance[0] / timeDifference;
+            this.calories += ((0.035 * weight) + (Math.pow(speed, 2) / height)*(0.029 * weight)) * (timeDifference / 60);
+            // used this to round numbers of this
+            distanceValueView.setText(Math.round(this.distance*100)/100.0 + " m");
+            caloriesValueView.setText(Math.round(this.calories*100)/100.0 + " cal");
+        }
+
+        locations.add(location);
     }
 
     @Override
@@ -211,68 +275,55 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        locationManager.removeUpdates(this);
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         mapView.onDestroy();
     }
 
-    @Override
     public void onLocationChanged(Location location) {
+        if(location != null) {
+            Double lng = location.getLongitude();
+            Double lat = location.getLatitude();
 
-        Double lng = location.getLongitude();
-        Double lat = location.getLatitude();
+            points.add(Point.fromLngLat(lng, lat));
 
-        points.add(Point.fromLngLat(lng, lat));
+            // TODO: ADD speed calculation
+            calculateValues(location);
+            // TODO: ADD calories calculation, need to extract settings from user
+            if(mapboxMap != null) {
+                // start route to track, now move to the center
+                if(points.size() == 1) {
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(lat, lng))
+                            .zoom(15)
+                            .build();
+                    mapboxMap.setCameraPosition(cameraPosition);
+                }
+                mapboxMap.getStyle( style -> {
+                    GeoJsonSource source = style.getSourceAs("line-source");
+                    LineString lineString = LineString.fromLngLats(points);
+                    Feature feature = Feature.fromGeometry(lineString);
+                    source.setGeoJson(feature);
 
-        // putting points in hashmap, to save them later in DB
-        String pointDate = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss").format(new Date(location.getTime()));
-        Toast.makeText(this, pointDate, Toast.LENGTH_SHORT).show();
-        pointHistory.put(pointDate, new ArrayList<>(Arrays.asList(lat, lng)));
-        // TODO: ADD speed calculation
-
-        // TODO: ADD calories calculation, need to extract settings from user
-        if(mapboxMap != null) {
-            // start route to track, now move to the center
-            if(points.size() == 1) {
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(new LatLng(lat, lng))
-                        .zoom(15)
-                        .build();
-                mapboxMap.setCameraPosition(cameraPosition);
+                    // update icon
+                    source = style.getSourceAs("dot-source");
+                    source.setGeoJson(Feature.fromGeometry(Point.fromLngLat(location.getLongitude(), location.getLatitude())));
+                });
             }
-            mapboxMap.getStyle( style -> {
-                GeoJsonSource source = style.getSourceAs("line-source");
-                LineString lineString = LineString.fromLngLats(points);
-                Feature feature = Feature.fromGeometry(lineString);
-                source.setGeoJson(feature);
-
-                // update icon
-                source = style.getSourceAs("dot-source");
-                source.setGeoJson(Feature.fromGeometry(Point.fromLngLat(location.getLongitude(), location.getLatitude())));
-            });
         }
     }
 
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        startActivity(intent);
+    private LocationRequest getLocationRequest() {
+        LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(2000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return locationRequest;
     }
 
     // handle when route is finished
     // TODO: put route in DB
     public void onFinishClick(View view) {
-        locationManager.removeUpdates(this);
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         Intent intent = new Intent(this, RouteActivity.class);
         startActivity(intent);
     }
