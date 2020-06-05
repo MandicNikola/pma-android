@@ -2,7 +2,9 @@ package com.example.pma;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
@@ -32,6 +34,8 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
     private RecyclerView recyclerView;
     private ArrayList<Route> routes;
     private RouteAdapter routeAdapter;
+    private static final String TAG = "RouteActivity";
+    private SharedPreferences preferences;
 
 
     @Override
@@ -40,6 +44,7 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
         setContentView(R.layout.activity_route);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -153,6 +158,15 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
         if(id == R.id.nav_settings){
             Intent intent = new Intent(RouteActivity.this, SettingsActivity.class);
             startActivity(intent);
+        }
+        if(id == R.id.nav_log_out){
+            Log.d(TAG,"User is logging out");
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.clear();
+            editor.commit();
+            Intent intent = new Intent(RouteActivity.this, MainActivity.class);
+            startActivity(intent);
+
         }
 
 

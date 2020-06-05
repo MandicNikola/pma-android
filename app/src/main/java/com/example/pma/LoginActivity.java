@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -28,6 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
     Retrofit retrofit;
     private AuthPlaceholder service;
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +70,14 @@ public class LoginActivity extends AppCompatActivity {
                 if(response.isSuccessful()){
                     if(response.code() == 200){
                         Log.d(TAG,"Successfull logged "+response.code());
+                        preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        Log.d(TAG,"Token "+response.body().getAccessToken());
+
+                        editor.putString("token", response.body().getAccessToken());
+                        editor.commit();
+
+                        Log.d(TAG,"Testiranje "+ getSharedPreferences("user_detail",MODE_PRIVATE).getString("token",null));
 
                         MessageDialogue dialog = new MessageDialogue("You have successfully logged in", "Notification");
                         dialog.show(getSupportFragmentManager(), "logging dialog");
