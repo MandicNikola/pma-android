@@ -10,8 +10,12 @@ public class Goal implements Parcelable {
     private double goalValue;
     private String goalKey;
     private Date date;
+    private User user;
+    private int percentage;
 
     public Goal(){}
+
+
 
     public Goal(Long id, double goalValue, String goalKey, Date date){
         this.id = id;
@@ -19,7 +23,22 @@ public class Goal implements Parcelable {
         this.goalKey = goalKey;
         this.date = date;
     }
+    public Goal(Long id, double goalValue, String goalKey, Date date, User user){
+        this.id = id;
+        this.goalValue = goalValue;
+        this.goalKey = goalKey;
+        this.date = date;
+        this.user = user;
+    }
 
+    public Goal(Long id, double goalValue, String goalKey, Date date, User user, int percentage) {
+        this.id = id;
+        this.goalValue = goalValue;
+        this.goalKey = goalKey;
+        this.date = date;
+        this.user = user;
+        this.percentage = percentage;
+    }
     protected Goal(Parcel in) {
         if (in.readByte() == 0) {
             id = null;
@@ -29,6 +48,22 @@ public class Goal implements Parcelable {
         goalValue = in.readDouble();
         goalKey = in.readString();
     }
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public int getPercentage() {
+        return percentage;
+    }
+
+    public void setPercentage(int percentage) {
+        this.percentage = percentage;
+    }
+
 
     public static final Creator<Goal> CREATOR = new Creator<Goal>() {
         @Override

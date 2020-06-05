@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    static final String DB_NAME = "ANDROID_DATABASE.DB";
+    static final String DB_NAME = "ANDROID_DATABASE_PMA1.DB";
     static final int DB_VERSION = 1;
     public static final String TABLE_GOALS = "goals";
     public static final String TABLE_USERS = "users";
@@ -31,33 +31,62 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String LONGITUDE = "longitude";
     public  static final String LATITUDE = "latitude";
     public static final String ROUTE_ID = "route_id";
+    public static final String GOAL_USER = "userId";
+    public static final String PERCENTAGE = "percentage";
 
+    /*
+ String CREATE_POSTS_TABLE = "CREATE TABLE " + TABLE_POSTS +
+                "(" +
+                    KEY_POST_ID + " INTEGER PRIMARY KEY," + // Define a primary key
+                    KEY_POST_USER_ID_FK + " INTEGER REFERENCES " + TABLE_USERS + "," + // Define a foreign key
+                    KEY_POST_TEXT + " TEXT" +
+                ")";
+*/
+    private static final String CREATE_GOALS = " create table " + TABLE_GOALS +
+        "("+
+            _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+            VALUE + " INTEGER, " +
+            GOAL_USER + " INTEGER, " +
+            PERCENTAGE + " INTEGER, " +
+            KEY + " TEXT, " +
+            DATE + " TEXT" +
+        ");";
 
-    private static final String CREATE_GOALS = " create table " + TABLE_GOALS+"("+ _ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+ VALUE+
-            " INTEGER, " + KEY+
-            " TEXT, " + DATE + " TEXT);";
+    private static final String CREATE_USERS = " create table " + TABLE_USERS+
+            "("+
+                _ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                FIRSTNAME+ " TEXT, " +
+                LASTNAME+ " TEXT NOT NULL, " +
+                USERNAME+ " TEXT NOT NULL, " +
+                EMAIL+ " TEXT NOT NULL, " +
+                PASSWORD + " TEXT"+
+            ");";
 
-    private static final String CREATE_USERS = " create table " + TABLE_USERS+"("+ _ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+ FIRSTNAME+
-            " TEXT, " + LASTNAME+
-            " TEXT NOT NULL, " + USERNAME+
-            " TEXT NOT NULL, " + EMAIL+
-            " TEXT NOT NULL, " + PASSWORD + " TEXT);";
+    private static final String CREATE_SETTINGS = " create table " + TABLE_SETTINGS+
+            "("+
+                _ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                WATER_REMINDER+" ,BOOLEAN"+
+            ");";
 
-    private static final String CREATE_SETTINGS = " create table " + TABLE_SETTINGS+"("+ _ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+ WATER_REMINDER+
-            " ,TEXT);";
+    private static final String CREATE_ROUTES = " create table " + TABLE_ROUTES+
+            "("+
+                _ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
+                CALORIES +" REAL, " +
+                DISTANCE +" REAL, " +
+                UNIT + " TEXT"+
+              ");";
 
-    private static final String CREATE_ROUTES = " create table " + TABLE_ROUTES+"("+ _ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+ CALORIES+
-            " REAL, " + DISTANCE+
-            " REAL, " + UNIT + " TEXT);";
-
-    public static final String CREATE_POINTS = "create table "+TABLE_POINTS + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + LONGITUDE+
-            " REAL, " + LATITUDE+
-            " REAL, " + ROUTE_ID+
-            " INTEGER);";
+    public static final String CREATE_POINTS = "create table "+TABLE_POINTS +
+            "(" +
+                _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                LONGITUDE + " REAL, " +
+                LATITUDE + " REAL, " +
+                ROUTE_ID + " INTEGER"+
+             ");";
     public DatabaseHelper(Context context){
         super(context,DB_NAME,null,1);
-
     }
+
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_GOALS);
@@ -79,5 +108,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             onCreate(db);
         }
         onCreate(db);
+    }
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        db.setForeignKeyConstraintsEnabled(true);
     }
 }

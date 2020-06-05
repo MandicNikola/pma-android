@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.util.Date;
 
@@ -28,11 +29,22 @@ public class DatabaseManagerGoal {
 
     }
 
-    public void insert(String key, int value, String date){
+   /* public void insert(String key, int value, String date){
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.KEY, key);
         contentValues.put(DatabaseHelper.VALUE, value);
         contentValues.put(DatabaseHelper.DATE, date);
+        contentValues.put(DatabaseHelper.PERCENTAGE, 0);
+        database.insert(DatabaseHelper.TABLE_GOALS, null, contentValues);
+    }*/
+    public void insert(String key, int value, String date, int userId){
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.KEY, key);
+        contentValues.put(DatabaseHelper.VALUE, value);
+        contentValues.put(DatabaseHelper.DATE, date);
+        contentValues.put(DatabaseHelper.GOAL_USER, userId);
+        contentValues.put(DatabaseHelper.PERCENTAGE, 0);
         database.insert(DatabaseHelper.TABLE_GOALS, null, contentValues);
     }
     public Cursor fetch(){
