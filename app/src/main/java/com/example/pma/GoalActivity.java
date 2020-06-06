@@ -89,11 +89,6 @@ public class GoalActivity extends AppCompatActivity {
             });
         }
 
-        if(goals==null){
-            goals = new ArrayList<>();
-
-        }
-
         if(goals.size() == 0){
             initializeData();
         }

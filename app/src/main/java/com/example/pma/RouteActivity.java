@@ -160,14 +160,12 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
             startActivity(intent);
         }
         if(id == R.id.nav_log_out){
-            Log.d(TAG,"User is logging out");
             SharedPreferences.Editor editor = preferences.edit();
             editor.clear();
             editor.commit();
             Intent intent = new Intent(RouteActivity.this, MainActivity.class);
             startActivity(intent);
-
-        }
+       }
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

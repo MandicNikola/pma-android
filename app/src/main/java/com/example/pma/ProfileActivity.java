@@ -24,7 +24,6 @@ public class ProfileActivity extends AppCompatActivity {
     private Spinner spinnerGender;
     private Spinner spinnerUnits;
     String[] gender_array = { "Male", "Female"};
-    String[] units_array = { "Metric", "Imperial"};
     EditText editName;
     EditText editSurname;
     EditText editEmail;
@@ -41,7 +40,6 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         spinnerGender = (Spinner) findViewById(R.id.gender_spinner);
-        spinnerUnits = (Spinner) findViewById(R.id.unit_spinner);
         retrofit = new Retrofit.Builder()
                 .baseUrl("https://pma-app-19.herokuapp.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -58,13 +56,8 @@ public class ProfileActivity extends AppCompatActivity {
         adapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(adapterGender);
 
-        ArrayAdapter adapterUnit= new ArrayAdapter(this,android.R.layout.simple_spinner_item, units_array);
-        adapterUnit.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerUnits.setAdapter(adapterUnit);
         if(preferences.contains("token") ) {
-            Log.d(TAG,"Token is there");
             String token = preferences.getString("token",null);
-            Log.d(TAG,"Token  is "+token);
             service = retrofit.create(AuthPlaceholder.class);
 
             Call<UserResponse> call = service.getLoggedUser("Bearer "+token);
@@ -72,23 +65,18 @@ public class ProfileActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                     Log.d(TAG,"Code is "+response.code());
-
                     if (response.isSuccessful()) {
                             if(response.code() == 200){
-
-                                Log.d(TAG,"User  is "+response.body().getFirstname());
                                 editName.setText(response.body().getFirstname());
                                 editSurname.setText(response.body().getLastname());
                                 editEmail.setText(response.body().getEmail());
-
                             }
                     }
                 }
                 @Override
                 public void onFailure(Call<UserResponse> call, Throwable t) {
                     Log.d(TAG,"Unsuccessfull");
-
-                }
+                  }
             });
         }else{
             Log.d(TAG,"Token is not there");
