@@ -47,12 +47,9 @@ public class LoginActivity extends AppCompatActivity {
         boolean correct = true;
             if(TextUtils.isEmpty(username)){
                 correct = false;
-                Log.d(TAG,"Username is empty");
-
             }
             if(TextUtils.isEmpty(password)){
                 correct = false;
-                Log.d(TAG,"Password is empty");
             }
             if(correct){
                 LoginRequest request = new LoginRequest(username, password);
@@ -69,15 +66,11 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if(response.isSuccessful()){
                     if(response.code() == 200){
-                        Log.d(TAG,"Successfull logged "+response.code());
                         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
                         SharedPreferences.Editor editor = preferences.edit();
-                        Log.d(TAG,"Token "+response.body().getAccessToken());
 
                         editor.putString("token", response.body().getAccessToken());
                         editor.commit();
-
-                        Log.d(TAG,"Testiranje "+ getSharedPreferences("user_detail",MODE_PRIVATE).getString("token",null));
 
                         MessageDialogue dialog = new MessageDialogue("You have successfully logged in", "Notification");
                         dialog.show(getSupportFragmentManager(), "logging dialog");
@@ -100,20 +93,16 @@ public class LoginActivity extends AppCompatActivity {
                         Toast toast = Toast.makeText(context, mess, duration);
                         toast.show();
                     }else {
-                        Log.d(TAG, "Unsuccessfull logging" + response.code());
                         MessageDialogue dialog = new MessageDialogue("Sign in unsuccessfully, please try again.", "Notification");
                         dialog.show(getSupportFragmentManager(), "logging dialog");
                     }
                     Log.d(TAG,"Unsuccessfull logged "+response.code());
                 }
-
-
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 Log.d(TAG,"failed "+t.getMessage());
-
             }
         });
   }

@@ -89,8 +89,6 @@ public class RegisterActivity extends AppCompatActivity {
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if(response.isSuccessful()){
                     if(response.code() == 200) {
-
-                        Log.d(TAG, "Registration successfull " + response.code() + " " + response.message());
                         MessageDialogue dialog = new MessageDialogue("You have successfully registered", "Notification");
                         dialog.show(getSupportFragmentManager(), "example dialog");
 
@@ -113,7 +111,6 @@ public class RegisterActivity extends AppCompatActivity {
                         Toast toast = Toast.makeText(context, mess, duration);
                         toast.show();
                     }else {
-                        Log.d(TAG, "Unsuccessfull registration" + response.code());
                         MessageDialogue dialog = new MessageDialogue("You are not successfully registered" + response.code(), "Notification");
                         dialog.show(getSupportFragmentManager(), "example dialog");
                     }
