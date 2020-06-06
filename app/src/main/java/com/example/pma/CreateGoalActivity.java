@@ -93,10 +93,11 @@ public class CreateGoalActivity extends AppCompatActivity {
             });
         }
         Intent intent  = new Intent();
-        Log.d(TAG, " datum  "+date);
 
         Date goalDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
-        intent.putExtra(GOAL_RESULT, new Goal((long)-1,value,key,goalDate));
+        Goal goal = new Goal(Long.parseLong("1"), value, key, goalDate);
+        Log.d(TAG, goal.getDate().toString());
+        intent.putExtra(GOAL_RESULT, goal);
         setResult(RESULT_OK, intent);
         finish();
     }

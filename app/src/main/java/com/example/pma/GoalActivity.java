@@ -77,21 +77,20 @@ public class GoalActivity extends AppCompatActivity {
         goalAdapter = new GoalAdapter( goals,this);
         recyclerView.setAdapter(goalAdapter);
     }
-    //TODO: Check for solution
-    /*
+
+    // TODO: Check for solution
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == CREATE_GOAL){
-            if(resultCode == RESULT_OK) {
-                Log.d(TAG, " result  ");
+            if(resultCode == RESULT_OK && data.hasExtra(CreateGoalActivity.GOAL_RESULT)) {
                 Goal goal = data.getParcelableExtra(CreateGoalActivity.GOAL_RESULT);
+
                 goals.add(goal);
                 goalAdapter.notifyDataSetChanged();
             }
         }
     }
-    */
 
 }
