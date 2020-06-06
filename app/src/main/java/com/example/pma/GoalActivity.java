@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.pma.adapter.GoalAdapter;
+import com.example.pma.database.DatabaseManagerGoal;
 import com.example.pma.model.Goal;
 import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
@@ -32,6 +33,8 @@ public class GoalActivity extends AppCompatActivity {
     private SharedPreferences preferences;
     Retrofit retrofit;
     private AuthPlaceholder service;
+    private DatabaseManagerGoal dbManager;
+
     //saljemo token on vraca ciljeve
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,9 @@ public class GoalActivity extends AppCompatActivity {
                 .build();
 
         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
+
+        dbManager = new DatabaseManagerGoal(this);
+        dbManager.open();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -61,42 +67,15 @@ public class GoalActivity extends AppCompatActivity {
         if(savedInstanceState != null) {
             goals = savedInstanceState.getParcelableArrayList("goal");
         } else {
-            goals = new ArrayList<>();
+            goals = dbManager.getGoals();
         }
 
         goalAdapter = new GoalAdapter( goals,this);
 
         recyclerView.setAdapter(goalAdapter);
 
-        if(preferences.contains("token") ) {
-            String token = preferences.getString("token",null);
-            service = retrofit.create(AuthPlaceholder.class);
 
-            Call<UserResponse> call = service.getLoggedUser("Bearer "+token);
-            call.enqueue(new Callback<UserResponse>() {
-                @Override
-                public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
 
-                    if (response.isSuccessful()) {
-                        if(response.code() == 200){
-                             Integer id = response.body().getId();
-                        }
-                    }
-                }
-                @Override
-                public void onFailure(Call<UserResponse> call, Throwable t) {
-                }
-            });
-        }
-
-        if(goals==null){
-            goals = new ArrayList<>();
-
-        }
-
-        if(goals.size() == 0){
-            initializeData();
-        }
 
     }
     public void initializeData(){

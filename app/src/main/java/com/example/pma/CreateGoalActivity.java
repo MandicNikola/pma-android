@@ -20,6 +20,8 @@ import com.example.pma.database.DatabaseManagerRoute;
 import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
 
+import java.util.Date;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -111,6 +113,7 @@ public class CreateGoalActivity extends AppCompatActivity {
         String month_string = Integer.toString(month+1);
         String day_string = Integer.toString(day);
         String year_string = Integer.toString(year);
+        Date goalDate = new Date();
         date = year_string+"-"+month_string+"-"+day_string;
         String dateMessage = (month_string +
                 "/" + day_string + "/" + year_string);
