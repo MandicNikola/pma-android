@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.example.pma.database.DatabaseManagerGoal;
 import com.example.pma.database.DatabaseManagerPoint;
 import com.example.pma.database.DatabaseManagerRoute;
+import com.example.pma.model.Goal;
 import com.example.pma.model.Route;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -43,6 +44,7 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -85,6 +87,8 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     //for  SQlite database
     private DatabaseManagerRoute dbManager;
     private DatabaseManagerPoint dbManagerPoint;
+    private DatabaseManagerGoal dbManagerGoal;
+
 
     // GOOGLE API LOCATIONS USED FOR APP
     FusedLocationProviderClient fusedLocationProviderClient;
@@ -92,6 +96,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     LocationCallback locationCallback;
 
     private Button finishButton;
+    private static final String TAG = "ActiveRoute";
 
 
     @Override
@@ -315,7 +320,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 String current_time_string = simpleDateFormat.format(start_date);
                 long idPoint = dbManagerPoint.insert((float)location.getLongitude(),(float)location.getLatitude(),id,current_time_string);
             }
-
+            startTracking = false;
         }
         mapView.onDestroy();
     }
@@ -360,7 +365,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     // handle when route is finished
     // TODO: put route in DB
-    public void onFinishClick(View view) {
+    public void onFinishClick(View view) throws ParseException {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         Location firstLocation = (Location) locations.get(0);
         Location lastLocation = (Location) locations.get(locations.size()-1);
@@ -379,6 +384,30 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             String current_time_string = simpleDateFormat.format(start_date);
             long idPoint = dbManagerPoint.insert((float)location.getLongitude(),(float)location.getLatitude(),id,current_time_string);
         }
+        Date endDateRoute=new SimpleDateFormat("yyyy-MM-dd").parse(strDate1);
+
+        ArrayList<Goal> goals = new ArrayList<>();
+        dbManagerGoal = new DatabaseManagerGoal(this);
+        dbManagerGoal.open();
+
+        goals = dbManagerGoal.getGoals();
+        for(Goal goal:goals){
+            if(goal.getDate().after(endDateRoute)){
+                SimpleDateFormat simpleDateFormatGoal = new SimpleDateFormat("yyyy-MM-dd");
+                String goalDate = simpleDateFormatGoal.format(goal.getDate());
+
+                if(goal.getGoalKey().equals("Distance")) {
+
+                    double currentValueDistance = goal.getCurrentValue() + this.distance;
+                    dbManagerGoal.update(goal.getId(), goal.getGoalKey(), goal.getGoalValue(), goalDate, currentValueDistance);
+                }else{
+
+                    double currentValueCalories = goal.getCurrentValue() + this.calories;
+                    dbManagerGoal.update(goal.getId(), goal.getGoalKey(), goal.getGoalValue(), goalDate, currentValueCalories);
+                }
+            }
+        }
+        dbManagerGoal.close();
         Intent intent = new Intent(this, RouteActivity.class);
         startActivity(intent);
 
