@@ -8,7 +8,9 @@ public class Route implements Parcelable {
     private int calories;
     private int distance;
     private String unit;
-    private long synchronized_id;
+    private Long synchronized_id;
+    private String start_time;
+    private String end_time;
 
 
     public Route() {
@@ -67,11 +69,11 @@ public class Route implements Parcelable {
         return 0;
     }
 
-    public long getSynchronized_id() {
+    public Long getSynchronized_id() {
         return synchronized_id;
     }
 
-    public void setSynchronized_id(long synchronized_id) {
+    public void setSynchronized_id(Long synchronized_id) {
         this.synchronized_id = synchronized_id;
     }
 
@@ -92,4 +94,20 @@ public class Route implements Parcelable {
             return new Route[size];
         }
     };
+
+    public String getStart_time() {
+        return start_time;
+    }
+
+    public void setStart_time(String start_time) {
+        this.start_time = start_time;
+    }
+
+    public String getEnd_time() {
+        return end_time;
+    }
+
+    public void setEnd_time(String end_time) {
+        this.end_time = end_time;
+    }
 }

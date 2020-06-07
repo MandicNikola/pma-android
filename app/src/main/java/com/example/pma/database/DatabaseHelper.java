@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    static final String DB_NAME = "ANDROID_DATABASE_PMA1.DB";
+    static final String DB_NAME = "ANDROID_DATABASE_PMA3.DB";
     static final int DB_VERSION = 1;
     public static final String TABLE_GOALS = "goals";
     public static final String TABLE_USERS = "users";
@@ -28,8 +28,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CALORIES = "calories";
     public static final String DISTANCE = "distance";
     public static final String UNIT = "unit";
+    public static final String SYNCHRONIZED_ID ="synchronized_id";
+
+    public static final String START_DATE ="start_date";
+    public static final String END_DATE ="end_date";
+
     public static final String LONGITUDE = "longitude";
     public  static final String LATITUDE = "latitude";
+    public static final String CURRENT_TIME ="current_time";
+
     public static final String ROUTE_ID = "route_id";
     public static final String GOAL_USER = "userId";
     public static final String PERCENTAGE = "percentage";
@@ -73,7 +80,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 _ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
                 CALORIES +" REAL, " +
                 DISTANCE +" REAL, " +
-                UNIT + " TEXT"+
+                UNIT + " TEXT, "+
+                SYNCHRONIZED_ID + " REAL, "+
+                START_DATE + " TEXT, "+
+                END_DATE + " TEXT "+
               ");";
 
     public static final String CREATE_POINTS = "create table "+TABLE_POINTS +
@@ -81,6 +91,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 LONGITUDE + " REAL, " +
                 LATITUDE + " REAL, " +
+                CURRENT_TIME +" TEXT, " +
                 ROUTE_ID + " INTEGER"+
              ");";
     public DatabaseHelper(Context context){

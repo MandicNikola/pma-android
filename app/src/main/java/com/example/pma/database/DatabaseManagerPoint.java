@@ -23,16 +23,17 @@ public class DatabaseManagerPoint {
         dbHelper.close();
     }
 
-    public void insert(float longitude,float latitude,long route_id){
+    public long insert(float longitude,float latitude,long route_id, String currentTime){
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.LONGITUDE,longitude);
         contentValues.put(DatabaseHelper.LATITUDE,latitude);
         contentValues.put(DatabaseHelper.ROUTE_ID,route_id);
+        contentValues.put(DatabaseHelper.CURRENT_TIME,currentTime);
 
-        database.insert(DatabaseHelper.TABLE_POINTS, null, contentValues);
+       return database.insert(DatabaseHelper.TABLE_POINTS, null, contentValues);
     }
     public Cursor fetch(){
-        String[] columns  = new String[]{DatabaseHelper._ID,DatabaseHelper.LONGITUDE,DatabaseHelper.LATITUDE,DatabaseHelper.ROUTE_ID};
+        String[] columns  = new String[]{DatabaseHelper._ID,DatabaseHelper.LONGITUDE,DatabaseHelper.LATITUDE,DatabaseHelper.ROUTE_ID,DatabaseHelper.CURRENT_TIME};
         Cursor cursor = database.query(DatabaseHelper.TABLE_POINTS, columns, null,null,null,null,null);
         if(cursor != null){
             cursor.moveToFirst();
@@ -40,11 +41,13 @@ public class DatabaseManagerPoint {
         return  cursor;
 
     }
-    public int update(long id,float longitude,float latitude,long route_id){
+    public int update(long id,float longitude,float latitude,long route_id,String currentTime){
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.LONGITUDE,longitude);
         contentValues.put(DatabaseHelper.LATITUDE,latitude);
         contentValues.put(DatabaseHelper.ROUTE_ID,route_id);
+
+        contentValues.put(DatabaseHelper.CURRENT_TIME,currentTime);
 
         int i = database.update(DatabaseHelper.TABLE_POINTS,contentValues,DatabaseHelper._ID + " = "+id,null);
         return i ;

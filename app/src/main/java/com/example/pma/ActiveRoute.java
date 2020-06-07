@@ -12,10 +12,14 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.pma.database.DatabaseManagerGoal;
+import com.example.pma.database.DatabaseManagerPoint;
+import com.example.pma.database.DatabaseManagerRoute;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -38,7 +42,9 @@ import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
@@ -75,6 +81,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     private double weight = 105;
 
     private boolean startTracking = false;
+    //for  SQlite database
+    private DatabaseManagerRoute dbManager;
+    private DatabaseManagerPoint dbManagerPoint;
 
     // GOOGLE API LOCATIONS USED FOR APP
     FusedLocationProviderClient fusedLocationProviderClient;
@@ -82,6 +91,8 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     LocationCallback locationCallback;
 
     private Button finishButton;
+    private static final String TAG = "ActiveRouteActivity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +104,10 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         caloriesValueView = (TextView)findViewById(R.id.calories_value);
         caloriesValueView.setText("0 cal");
 
+        dbManager = new DatabaseManagerRoute(this);
+        dbManager.open();
+        dbManagerPoint = new DatabaseManagerPoint(this);
+        dbManagerPoint.open();
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
@@ -327,11 +342,30 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     // TODO: put route in DB
     public void onFinishClick(View view) {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        Location firstLocation = (Location) locations.get(0);
+        Location lastLocation = (Location) locations.get(locations.size()-1);
+        Date start_date = new Date(firstLocation.getTime());
+        Date end_date = new Date(lastLocation.getTime());
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String strDate1 = simpleDateFormat.format(start_date);
+        String strDate2 = simpleDateFormat.format(end_date);
+
+        long id = -1;
+        id=dbManager.insert(this.calories,this.distance,"m",(long)-1,strDate1,strDate2);
+        Log.d(TAG," end id "+id);
+        for(int i = 0 ;i< locations.size();i++){
+            Location location = (Location) locations.get(i);
+            Date current_time = new Date(location.getTime());
+            String current_time_string = simpleDateFormat.format(start_date);
+            long idPoint = dbManagerPoint.insert((float)location.getLongitude(),(float)location.getLatitude(),id,current_time_string);
+        }
         Intent intent = new Intent(this, RouteActivity.class);
         startActivity(intent);
     }
 
     public void onStartClick(View view) {
+
         view.setVisibility(View.GONE);
         finishButton.setVisibility(View.VISIBLE);
         this.startTracking = true;

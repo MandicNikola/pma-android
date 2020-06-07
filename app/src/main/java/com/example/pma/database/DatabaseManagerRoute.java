@@ -23,15 +23,19 @@ public class DatabaseManagerRoute {
         dbHelper.close();
     }
 
-    public void insert(int calories,int distance,String unit){
+    public long insert(double calories,double distance,String unit,Long synchronized_id,String start_date,String end_date){
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.CALORIES,calories);
         contentValues.put(DatabaseHelper.DISTANCE,distance);
         contentValues.put(DatabaseHelper.UNIT,unit);
-        database.insert(DatabaseHelper.TABLE_ROUTES, null, contentValues);
+        contentValues.put(DatabaseHelper.SYNCHRONIZED_ID,synchronized_id);
+        contentValues.put(DatabaseHelper.START_DATE,start_date);
+        contentValues.put(DatabaseHelper.END_DATE,end_date);
+        long i =  database.insert(DatabaseHelper.TABLE_ROUTES, null, contentValues);
+       return i;
     }
     public Cursor fetch(){
-        String[] columns  = new String[]{DatabaseHelper._ID, DatabaseHelper.CALORIES,DatabaseHelper.DISTANCE,DatabaseHelper.UNIT};
+        String[] columns  = new String[]{DatabaseHelper._ID, DatabaseHelper.CALORIES,DatabaseHelper.DISTANCE,DatabaseHelper.UNIT,DatabaseHelper.SYNCHRONIZED_ID,DatabaseHelper.START_DATE,DatabaseHelper.END_DATE};
         Cursor cursor = database.query(DatabaseHelper.TABLE_ROUTES, columns, null,null,null,null,null);
         if(cursor != null){
             cursor.moveToFirst();
@@ -39,11 +43,16 @@ public class DatabaseManagerRoute {
         return  cursor;
 
     }
-    public int update(long id,int calories,int distance,String unit){
+    public int update(long id,double calories,double distance,String unit,Long synchronized_id,String start_date,String end_date){
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.CALORIES,calories);
         contentValues.put(DatabaseHelper.DISTANCE,distance);
         contentValues.put(DatabaseHelper.UNIT,unit);
+        contentValues.put(DatabaseHelper.SYNCHRONIZED_ID,synchronized_id);
+        contentValues.put(DatabaseHelper.START_DATE,start_date);
+        contentValues.put(DatabaseHelper.END_DATE,end_date);
+
+
         int i = database.update(DatabaseHelper.TABLE_ROUTES,contentValues,DatabaseHelper._ID + " = "+id,null);
         return i ;
     }
