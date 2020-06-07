@@ -295,14 +295,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             if(startTracking) calculateValues(location);
 
                 if(mapboxMap != null) {
-                    // start route to track, now move to the center
-                    if(points.size() == 1) {
-                        CameraPosition cameraPosition = new CameraPosition.Builder()
-                                .target(new LatLng(lat, lng))
-                                .zoom(15)
-                                .build();
-                        mapboxMap.setCameraPosition(cameraPosition);
-                    }
                     mapboxMap.getStyle( style -> {
                         GeoJsonSource source = style.getSourceAs("line-source");
                         LineString lineString = LineString.fromLngLats(points);
