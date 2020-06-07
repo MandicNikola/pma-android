@@ -109,7 +109,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             }
         };
 
-        fusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, null);
+        fusedLocationProviderClient.requestLocationUpdates(getLocationRequest((long)10000, (long)2000), locationCallback, null);
 
         /* location manager init flow */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -193,7 +193,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                     }
                 };
 
-                fusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, null);
+                fusedLocationProviderClient.requestLocationUpdates(getLocationRequest((long)10000, (long)2000), locationCallback, null);
                 initMapCenter();
                 break;
             default:
@@ -217,7 +217,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     private void calculateValues(Location location) {
         Double lat = location.getLatitude();
         Double lng = location.getLongitude();
-
         if(locations.size() >= 1) {
             // get last point
             Location previousLocation = (Location) locations.get(locations.size() - 1);
@@ -288,34 +287,35 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
             // TODO: ADD speed calculation
             calculateValues(location);
-            // TODO: ADD calories calculation, need to extract settings from user
-            if(mapboxMap != null) {
-                // start route to track, now move to the center
-                if(points.size() == 1) {
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(new LatLng(lat, lng))
-                            .zoom(15)
-                            .build();
-                    mapboxMap.setCameraPosition(cameraPosition);
-                }
-                mapboxMap.getStyle( style -> {
-                    GeoJsonSource source = style.getSourceAs("line-source");
-                    LineString lineString = LineString.fromLngLats(points);
-                    Feature feature = Feature.fromGeometry(lineString);
-                    source.setGeoJson(feature);
 
-                    // update icon
-                    source = style.getSourceAs("dot-source");
-                    source.setGeoJson(Feature.fromGeometry(Point.fromLngLat(location.getLongitude(), location.getLatitude())));
-                });
-            }
+                if(mapboxMap != null) {
+                    // start route to track, now move to the center
+                    if(points.size() == 1) {
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(new LatLng(lat, lng))
+                                .zoom(15)
+                                .build();
+                        mapboxMap.setCameraPosition(cameraPosition);
+                    }
+                    mapboxMap.getStyle( style -> {
+                        GeoJsonSource source = style.getSourceAs("line-source");
+                        LineString lineString = LineString.fromLngLats(points);
+                        Feature feature = Feature.fromGeometry(lineString);
+                        source.setGeoJson(feature);
+
+                        // update icon
+                        source = style.getSourceAs("dot-source");
+                        source.setGeoJson(Feature.fromGeometry(Point.fromLngLat(location.getLongitude(), location.getLatitude())));
+                    });
+                }
+
         }
     }
 
-    private LocationRequest getLocationRequest() {
+    private LocationRequest getLocationRequest(Long interval, Long fastestInterval) {
         LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(2000);
+        locationRequest.setInterval(interval);
+        locationRequest.setFastestInterval(fastestInterval);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         return locationRequest;
     }
