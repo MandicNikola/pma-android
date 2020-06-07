@@ -10,8 +10,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.example.pma.model.LoginResponse;
+import com.example.pma.model.Profile;
 import com.example.pma.model.User;
-import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
 
 import retrofit2.Call;
@@ -23,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class ProfileActivity extends AppCompatActivity {
     private Spinner spinnerGender;
     private Spinner spinnerUnits;
-    String[] gender_array = { "Male", "Female"};
+    String[] gender_array = { "MALE", "FEMALE"};
     EditText editName;
     EditText editSurname;
     EditText editEmail;
@@ -60,21 +60,25 @@ public class ProfileActivity extends AppCompatActivity {
             String token = preferences.getString("token",null);
             service = retrofit.create(AuthPlaceholder.class);
 
-            Call<UserResponse> call = service.getLoggedUser("Bearer "+token);
-            call.enqueue(new Callback<UserResponse>() {
+            Call<Profile> call = service.getProfile("Bearer "+token);
+            call.enqueue(new Callback<Profile>() {
                 @Override
-                public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                public void onResponse(Call<Profile> call, Response<Profile> response) {
                     Log.d(TAG,"Code is "+response.code());
                     if (response.isSuccessful()) {
                             if(response.code() == 200){
                                 editName.setText(response.body().getFirstname());
                                 editSurname.setText(response.body().getLastname());
                                 editEmail.setText(response.body().getEmail());
+                                editHeight.setText(String.valueOf(response.body().getHeight()));
+                                editWeight.setText(String.valueOf(response.body().getWeight()));
+                                int spinnerPosition = adapterGender.getPosition(response.body().getGender());
+                                spinnerGender.setSelection(spinnerPosition);
                             }
                     }
                 }
                 @Override
-                public void onFailure(Call<UserResponse> call, Throwable t) {
+                public void onFailure(Call<Profile> call, Throwable t) {
                     Log.d(TAG,"Unsuccessfull");
                   }
             });

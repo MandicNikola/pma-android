@@ -2,6 +2,7 @@ package com.example.pma.services;
 
 import com.example.pma.model.LoginRequest;
 import com.example.pma.model.LoginResponse;
+import com.example.pma.model.Profile;
 import com.example.pma.model.User;
 import com.example.pma.model.UserResponse;
 
@@ -20,5 +21,7 @@ public interface AuthPlaceholder {
     Call<LoginResponse> loginUser(@Body LoginRequest user);
     @GET("users/getLogged")
     Call<UserResponse> getLoggedUser(@Header("Authorization") String token);
+    @GET("users/profile")
+    Call<Profile> getProfile(@Header("Authorization") String token);
 
 }
