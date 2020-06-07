@@ -317,6 +317,12 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     *
+     * @param interval - interval used to get location updates
+     * @param fastestInterval - fastest interval, used to prepare to get location.
+     * @return locationRequest prepared for `fused` API
+     */
     private LocationRequest getLocationRequest(Long interval, Long fastestInterval) {
         LocationRequest locationRequest = new LocationRequest();
         locationRequest.setInterval(interval);
