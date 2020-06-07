@@ -24,6 +24,11 @@ public class Route implements Parcelable {
         this.unit = unit;
     }
 
+    public Route(Long id, double calories, double distance) {
+        this.id = id;
+        this.calories = calories;
+        this.distance = distance;
+    }
 
     public Long getId() {
         return id;

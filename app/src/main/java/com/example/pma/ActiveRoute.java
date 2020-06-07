@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.example.pma.database.DatabaseManagerGoal;
 import com.example.pma.database.DatabaseManagerPoint;
 import com.example.pma.database.DatabaseManagerRoute;
+import com.example.pma.model.Route;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -91,7 +92,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     LocationCallback locationCallback;
 
     private Button finishButton;
-    private static final String TAG = "ActiveRouteActivity";
 
 
     @Override
@@ -381,6 +381,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         }
         Intent intent = new Intent(this, RouteActivity.class);
         startActivity(intent);
+
     }
 
     public void onStartClick(View view) {
