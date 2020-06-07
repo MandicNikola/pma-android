@@ -13,6 +13,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -73,10 +74,14 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     private double height = 192;
     private double weight = 105;
 
+    private boolean startTracking = false;
+
     // GOOGLE API LOCATIONS USED FOR APP
     FusedLocationProviderClient fusedLocationProviderClient;
 
     LocationCallback locationCallback;
+
+    private Button finishButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +96,8 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+        finishButton = findViewById(R.id.finishBtn);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -283,10 +290,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             Double lng = location.getLongitude();
             Double lat = location.getLatitude();
 
-            points.add(Point.fromLngLat(lng, lat));
+            if(startTracking) points.add(Point.fromLngLat(lng, lat));
 
-            // TODO: ADD speed calculation
-            calculateValues(location);
+            if(startTracking) calculateValues(location);
 
                 if(mapboxMap != null) {
                     // start route to track, now move to the center
@@ -308,7 +314,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                         source.setGeoJson(Feature.fromGeometry(Point.fromLngLat(location.getLongitude(), location.getLatitude())));
                     });
                 }
-
         }
     }
 
@@ -326,5 +331,11 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         Intent intent = new Intent(this, RouteActivity.class);
         startActivity(intent);
+    }
+
+    public void onStartClick(View view) {
+        view.setVisibility(View.GONE);
+        finishButton.setVisibility(View.VISIBLE);
+        this.startTracking = true;
     }
 }
