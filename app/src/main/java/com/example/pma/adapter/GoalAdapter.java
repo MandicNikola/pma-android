@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.pma.R;
 import com.example.pma.model.Goal;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 public class GoalAdapter  extends RecyclerView.Adapter<GoalAdapter.ViewHolder>{
@@ -39,6 +40,9 @@ private Context context;
 
     @Override
     public int getItemCount() {
+        if(goalList == null){
+            return 0;
+        }
             return goalList.size();
         }
 
@@ -54,7 +58,7 @@ private Context context;
             valueText = itemView.findViewById(R.id.goal_value);
         }
         void bindTo(Goal currentGoal) {
-            dateText.setText(currentGoal.getDate().getDate()+"/"+currentGoal.getDate().getMonth()+"/"+currentGoal.getDate().getYear());
+            dateText.setText(new SimpleDateFormat("dd/MM/yyyy").format(currentGoal.getDate()));
             goalText.setText(currentGoal.getGoalKey());
             Double val = currentGoal.getGoalValue();
             String valS = val.toString();

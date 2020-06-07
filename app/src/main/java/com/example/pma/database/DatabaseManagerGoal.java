@@ -7,12 +7,19 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.example.pma.model.Goal;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class DatabaseManagerGoal {
     private DatabaseHelper dbHelper;
     private Context context;
     private SQLiteDatabase database;
+    private static final String TAG = "DatabaseManagerGoal";
+
 
     public DatabaseManagerGoal(Context c){
         this.context = c;
@@ -74,6 +81,34 @@ public class DatabaseManagerGoal {
 
 
         return res;
+    }
+
+    public ArrayList<Goal> getGoals(){
+        ArrayList<Goal> goals = new ArrayList<>();
+        String GOAL_SELECT_QUERY = String.format("SELECT * FROM %s ;", DatabaseHelper.TABLE_GOALS);
+        Cursor cursor = database.rawQuery(GOAL_SELECT_QUERY, null);
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    Goal goal = new Goal();
+                    goal.setId(Long.parseLong(cursor.getString(cursor.getColumnIndex(dbHelper._ID))));
+                    goal.setGoalKey(cursor.getString(cursor.getColumnIndex(dbHelper.KEY)));
+                    goal.setGoalValue(Double.parseDouble(cursor.getString(cursor.getColumnIndex(dbHelper.VALUE))));
+                    String dateString = cursor.getString(cursor.getColumnIndex(dbHelper.DATE));
+                    Log.d(TAG, " date "+dateString);
+                    Date date = new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
+                    goal.setDate(date);
+                    goals.add(goal);
+                } while(cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "Error while trying to get goals from database");
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return goals;
     }
 
 }

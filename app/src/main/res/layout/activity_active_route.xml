@@ -97,6 +97,17 @@
             android:textColor="@color/white"
             android:layout_marginTop="10dp"
             android:onClick="onFinishClick"
+            android:visibility="gone"
             android:text="Finish" />
+        <Button
+            android:id="@+id/startButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_shape"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/design_default_color_primary"
+            android:layout_marginTop="10dp"
+            android:onClick="onStartClick"
+            android:text="Start" />
     </LinearLayout>
     </LinearLayout>

@@ -13,6 +13,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -73,10 +74,14 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     private double height = 192;
     private double weight = 105;
 
+    private boolean startTracking = false;
+
     // GOOGLE API LOCATIONS USED FOR APP
     FusedLocationProviderClient fusedLocationProviderClient;
 
     LocationCallback locationCallback;
+
+    private Button finishButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +96,8 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         mapView = (MapView) findViewById(R.id.mapView);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+        finishButton = findViewById(R.id.finishBtn);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -109,7 +116,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             }
         };
 
-        fusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, null);
+        fusedLocationProviderClient.requestLocationUpdates(getLocationRequest((long)10000, (long)2000), locationCallback, null);
 
         /* location manager init flow */
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -193,7 +200,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                     }
                 };
 
-                fusedLocationProviderClient.requestLocationUpdates(getLocationRequest(), locationCallback, null);
+                fusedLocationProviderClient.requestLocationUpdates(getLocationRequest((long)10000, (long)2000), locationCallback, null);
                 initMapCenter();
                 break;
             default:
@@ -217,7 +224,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     private void calculateValues(Location location) {
         Double lat = location.getLatitude();
         Double lng = location.getLongitude();
-
         if(locations.size() >= 1) {
             // get last point
             Location previousLocation = (Location) locations.get(locations.size() - 1);
@@ -284,38 +290,35 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             Double lng = location.getLongitude();
             Double lat = location.getLatitude();
 
-            points.add(Point.fromLngLat(lng, lat));
+            if(startTracking) points.add(Point.fromLngLat(lng, lat));
 
-            // TODO: ADD speed calculation
-            calculateValues(location);
-            // TODO: ADD calories calculation, need to extract settings from user
-            if(mapboxMap != null) {
-                // start route to track, now move to the center
-                if(points.size() == 1) {
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(new LatLng(lat, lng))
-                            .zoom(15)
-                            .build();
-                    mapboxMap.setCameraPosition(cameraPosition);
+            if(startTracking) calculateValues(location);
+
+                if(mapboxMap != null) {
+                    mapboxMap.getStyle( style -> {
+                        GeoJsonSource source = style.getSourceAs("line-source");
+                        LineString lineString = LineString.fromLngLats(points);
+                        Feature feature = Feature.fromGeometry(lineString);
+                        source.setGeoJson(feature);
+
+                        // update icon
+                        source = style.getSourceAs("dot-source");
+                        source.setGeoJson(Feature.fromGeometry(Point.fromLngLat(location.getLongitude(), location.getLatitude())));
+                    });
                 }
-                mapboxMap.getStyle( style -> {
-                    GeoJsonSource source = style.getSourceAs("line-source");
-                    LineString lineString = LineString.fromLngLats(points);
-                    Feature feature = Feature.fromGeometry(lineString);
-                    source.setGeoJson(feature);
-
-                    // update icon
-                    source = style.getSourceAs("dot-source");
-                    source.setGeoJson(Feature.fromGeometry(Point.fromLngLat(location.getLongitude(), location.getLatitude())));
-                });
-            }
         }
     }
 
-    private LocationRequest getLocationRequest() {
+    /**
+     *
+     * @param interval - interval used to get location updates
+     * @param fastestInterval - fastest interval, used to prepare to get location.
+     * @return locationRequest prepared for `fused` API
+     */
+    private LocationRequest getLocationRequest(Long interval, Long fastestInterval) {
         LocationRequest locationRequest = new LocationRequest();
-        locationRequest.setInterval(10000);
-        locationRequest.setFastestInterval(2000);
+        locationRequest.setInterval(interval);
+        locationRequest.setFastestInterval(fastestInterval);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         return locationRequest;
     }
@@ -326,5 +329,11 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         Intent intent = new Intent(this, RouteActivity.class);
         startActivity(intent);
+    }
+
+    public void onStartClick(View view) {
+        view.setVisibility(View.GONE);
+        finishButton.setVisibility(View.VISIBLE);
+        this.startTracking = true;
     }
 }

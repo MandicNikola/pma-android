@@ -12,6 +12,7 @@ public class Goal implements Parcelable {
     private Date date;
     private User user;
     private int percentage;
+    private double currentValue;
 
     public Goal(){}
 
@@ -39,14 +40,11 @@ public class Goal implements Parcelable {
         this.user = user;
         this.percentage = percentage;
     }
-    protected Goal(Parcel in) {
-        if (in.readByte() == 0) {
-            id = null;
-        } else {
-            id = in.readLong();
-        }
+    protected Goal(Parcel in)  {
+        id = in.readLong();
         goalValue = in.readDouble();
         goalKey = in.readString();
+        date = new Date(in.readLong());
     }
     public void setUser(User user) {
         this.user = user;
@@ -84,10 +82,10 @@ public class Goal implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(getId());
-        dest.writeDouble(getGoalValue());
-        dest.writeString(getGoalKey());
-        dest.writeString(getDate().toString());
+        dest.writeLong(id);
+        dest.writeDouble(goalValue);
+        dest.writeString(goalKey);
+        dest.writeLong(date.getTime());
     }
 
     public Long getId() {
@@ -122,4 +120,11 @@ public class Goal implements Parcelable {
         this.date = date;
     }
 
+    public double getCurrentValue() {
+        return currentValue;
+    }
+
+    public void setCurrentValue(double currentValue) {
+        this.currentValue = currentValue;
+    }
 }

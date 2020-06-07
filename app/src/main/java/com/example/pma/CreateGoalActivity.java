@@ -1,6 +1,7 @@
 package com.example.pma;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.Placeholder;
 import androidx.fragment.app.DialogFragment;
 
 import android.content.Context;
@@ -17,8 +18,16 @@ import android.widget.Toast;
 
 import com.example.pma.database.DatabaseManagerGoal;
 import com.example.pma.database.DatabaseManagerRoute;
+import com.example.pma.model.Goal;
+import com.example.pma.model.GoalRequest;
+import com.example.pma.model.GoalResponse;
 import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
+import com.example.pma.services.GoalPlaceholder;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,7 +45,11 @@ public class CreateGoalActivity extends AppCompatActivity {
     private SharedPreferences preferences;
     Retrofit retrofit;
     private AuthPlaceholder service;
+    private GoalPlaceholder goalService;
+
     private int id;
+    public static final String GOAL_RESULT = "GOAL_RESULT";
+    private static final String TAG = "CreateGoalActivity1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,13 +70,19 @@ public class CreateGoalActivity extends AppCompatActivity {
         dbManager.open();
 
     }
-    public void createGoal(View view) {
+    public void createGoal(View view) throws ParseException {
         EditText valueEditText = (EditText)findViewById(R.id.goal_value);
         value = Integer.parseInt(valueEditText.getText().toString());
         key = (String) spinner.getSelectedItem();
+        goalService = retrofit.create(GoalPlaceholder.class);
+        Date goalDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+        // TODO: Just add later id of goal not 1
+        Goal goal = new Goal(Long.parseLong("1"), value, key, goalDate);
+        String token = "";
+
 
         if(preferences.contains("token") ) {
-            String token = preferences.getString("token",null);
+             token = preferences.getString("token",null);
             service = retrofit.create(AuthPlaceholder.class);
 
             Call<UserResponse> call = service.getLoggedUser("Bearer "+token);
@@ -76,6 +95,8 @@ public class CreateGoalActivity extends AppCompatActivity {
                             id = response.body().getId();
                             dbManager.insert(key, value, date, id);
 
+
+
                         }
                     }
                 }
@@ -85,32 +106,54 @@ public class CreateGoalActivity extends AppCompatActivity {
                 }
             });
         }
-        Intent intent = new Intent(CreateGoalActivity.this, GoalActivity.class);
-        startActivity(intent);
+
+        /* Used to parse string just in case for parsing it for backend */
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date parsedDate = simpleDateFormat.parse(date);
+        GoalRequest goalReq = new GoalRequest(simpleDateFormat.format(parsedDate),key.toUpperCase(),value,(long)id,0);
+        Call<GoalResponse> callGoal = goalService.addGoal(goalReq,"Bearer "+token);
+        callGoal.enqueue(new Callback<GoalResponse>() {
+            @Override
+            public void onResponse(Call<GoalResponse> call, Response<GoalResponse> response) {
+                Log.d(TAG," kod je"+response.code());
+
+                if (response.isSuccessful()) {
+                    Log.d(TAG," uspjesno  je"+response.body().getId());
+
+                    if(response.code() == 200){
+                        Log.d(TAG," vratio se posle dodavanja "+response.code());
+
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<GoalResponse> call, Throwable t) {
+                Log.d(TAG," neuspesno");
+
+            }
+        });
+
+        Intent intent  = new Intent();
+
+
+        intent.putExtra(GOAL_RESULT, goal);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 
-    /*public void testInsert(){
 
-        Cursor cursor = dbManager.fetch();
-        cursor.moveToFirst();
-        //index krece od 1
-        CharSequence mess = "Unos goal "+cursor.getString(2);
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(context, mess, duration);
-        toast.show();
-    }
-*/
 
 
     public void showDatapicker(View view) {
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getSupportFragmentManager(),"datePicker");
     }
+
     public void processDatePickerResult(int year, int month, int day) {
         String month_string = Integer.toString(month+1);
         String day_string = Integer.toString(day);
         String year_string = Integer.toString(year);
+        Date goalDate = new Date();
         date = year_string+"-"+month_string+"-"+day_string;
         String dateMessage = (month_string +
                 "/" + day_string + "/" + year_string);
