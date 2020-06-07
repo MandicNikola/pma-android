@@ -297,6 +297,26 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     protected void onDestroy() {
         super.onDestroy();
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        if(startTracking){
+            Location firstLocation = (Location) locations.get(0);
+            Location lastLocation = (Location) locations.get(locations.size()-1);
+            Date start_date = new Date(firstLocation.getTime());
+            Date end_date = new Date(lastLocation.getTime());
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            String strDate1 = simpleDateFormat.format(start_date);
+            String strDate2 = simpleDateFormat.format(end_date);
+
+            long id = -1;
+            id=dbManager.insert(this.calories,this.distance,"m",(long)-1,strDate1,strDate2);
+            for(int i = 0 ;i< locations.size();i++){
+                Location location = (Location) locations.get(i);
+                Date current_time = new Date(location.getTime());
+                String current_time_string = simpleDateFormat.format(start_date);
+                long idPoint = dbManagerPoint.insert((float)location.getLongitude(),(float)location.getLatitude(),id,current_time_string);
+            }
+
+        }
         mapView.onDestroy();
     }
 
@@ -353,7 +373,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
         long id = -1;
         id=dbManager.insert(this.calories,this.distance,"m",(long)-1,strDate1,strDate2);
-        Log.d(TAG," end id "+id);
         for(int i = 0 ;i< locations.size();i++){
             Location location = (Location) locations.get(i);
             Date current_time = new Date(location.getTime());
