@@ -4,7 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -86,4 +89,27 @@ public class ProfileActivity extends AppCompatActivity {
             Log.d(TAG,"Token is not there");
         }
     }
+    public void checkData(View view) {
+        boolean valid = true;
+        if(isEmpty(editName.getText().toString())){
+            valid = false;
+        }
+        if(isEmpty(editSurname.getText().toString())) {
+            valid = false;
+        }
+        if(isEmpty(editEmail.getText().toString()) || isEmail(editEmail.getText().toString()) == false) {
+            valid = false;
+        }
+        if(valid){
+
+        }
+
+    }
+    public boolean isEmpty(String text){
+        return TextUtils.isEmpty(text);
+    }
+    public boolean isEmail(String text) {
+        return (!TextUtils.isEmpty(text) && Patterns.EMAIL_ADDRESS.matcher(text).matches());
+    }
+
 }

@@ -14,7 +14,9 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 public interface AuthPlaceholder {
     @POST("users")
@@ -25,5 +27,7 @@ public interface AuthPlaceholder {
     Call<UserResponse> getLoggedUser(@Header("Authorization") String token);
     @GET("users/profile")
     Call<Profile> getProfile(@Header("Authorization") String token);
+    @PATCH("users/updateProfile/{username}")
+    Call<LoginResponse> updateProfile(@Body Profile profile, @Path("username") String username);
 
 }
