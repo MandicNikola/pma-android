@@ -49,7 +49,7 @@ public class CreateGoalActivity extends AppCompatActivity {
 
     private int id;
     public static final String GOAL_RESULT = "GOAL_RESULT";
-    private static final String TAG = "CreateGoalActivity";
+    private static final String TAG = "CreateGoalActivity1";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,10 +107,10 @@ public class CreateGoalActivity extends AppCompatActivity {
             });
         }
 
-
-        GoalRequest goalReq = new GoalRequest(date,key.toUpperCase(),value,(long)id,0);
-        Log.d(TAG," token  je"+token);
-
+        /* Used to parse string just in case for parsing it for backend */
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date parsedDate = simpleDateFormat.parse(date);
+        GoalRequest goalReq = new GoalRequest(simpleDateFormat.format(parsedDate),key.toUpperCase(),value,(long)id,0);
         Call<GoalResponse> callGoal = goalService.addGoal(goalReq,"Bearer "+token);
         callGoal.enqueue(new Callback<GoalResponse>() {
             @Override
@@ -118,7 +118,7 @@ public class CreateGoalActivity extends AppCompatActivity {
                 Log.d(TAG," kod je"+response.code());
 
                 if (response.isSuccessful()) {
-                    Log.d(TAG," uspjesno  je"+response.code());
+                    Log.d(TAG," uspjesno  je"+response.body().getId());
 
                     if(response.code() == 200){
                         Log.d(TAG," vratio se posle dodavanja "+response.code());
