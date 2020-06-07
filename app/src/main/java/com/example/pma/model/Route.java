@@ -5,8 +5,8 @@ import android.os.Parcelable;
 
 public class Route implements Parcelable {
     private Long id;
-    private int calories;
-    private int distance;
+    private double calories;
+    private double distance;
     private String unit;
     private Long synchronized_id;
     private String start_time;
@@ -17,7 +17,7 @@ public class Route implements Parcelable {
 
     }
 
-    public Route(Long id, int calories, int distance, String unit) {
+    public Route(Long id, double calories, double distance, String unit) {
         this.id = id;
         this.calories = calories;
         this.distance = distance;
@@ -33,19 +33,19 @@ public class Route implements Parcelable {
         this.id = id;
     }
 
-    public int getCalories() {
+    public double getCalories() {
         return calories;
     }
 
-    public void setCalories(int calories) {
+    public void setCalories(double calories) {
         this.calories = calories;
     }
 
-    public int getDistance() {
+    public double getDistance() {
         return distance;
     }
 
-    public void setDistance(int distance) {
+    public void setDistance(double distance) {
         this.distance = distance;
     }
 
@@ -59,9 +59,12 @@ public class Route implements Parcelable {
 
     Route(Parcel in) {
         id = in.readLong();
-        calories = in.readInt();
-        distance = in.readInt();
+        calories = in.readDouble();
+        distance = in.readDouble();
         unit = in.readString();
+        start_time = in.readString();
+        end_time = in.readString();
+        synchronized_id = in.readLong();
     }
 
     @Override
@@ -80,9 +83,12 @@ public class Route implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
-        dest.writeInt(calories);
-        dest.writeInt(distance);
+        dest.writeDouble(calories);
+        dest.writeDouble(distance);
         dest.writeString(unit);
+        dest.writeString(start_time);
+        dest.writeString(end_time);
+        dest.writeLong(synchronized_id);
     }
 
     public static final Parcelable.Creator<Route> CREATOR = new Parcelable.Creator<Route>() {

@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.Menu;
 
 import com.example.pma.adapter.RouteAdapter;
+import com.example.pma.database.DatabaseManagerRoute;
 import com.example.pma.model.Route;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -36,6 +37,8 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
     private RouteAdapter routeAdapter;
     private static final String TAG = "RouteActivity";
     private SharedPreferences preferences;
+    private DatabaseManagerRoute dbManager;
+
 
 
     @Override
@@ -45,6 +48,9 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
+        dbManager = new DatabaseManagerRoute(this);
+        dbManager.open();
+        routes = dbManager.getRoutes();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -96,15 +102,14 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
 
         if(savedInstanceState != null) {
             routes = savedInstanceState.getParcelableArrayList("route");
-        } else {
-            routes = new ArrayList<>();
         }
 
         routeAdapter = new RouteAdapter(this, routes);
 
         recyclerView.setAdapter(routeAdapter);
+        routeAdapter.notifyDataSetChanged();
 
-        if(routes.size() == 0) dummyDataInit();
+      //  if(routes.size() == 0) dummyDataInit();
 
     }
 

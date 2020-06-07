@@ -36,14 +36,7 @@ public class DatabaseManagerGoal {
 
     }
 
-   /* public void insert(String key, int value, String date){
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.KEY, key);
-        contentValues.put(DatabaseHelper.VALUE, value);
-        contentValues.put(DatabaseHelper.DATE, date);
-        contentValues.put(DatabaseHelper.PERCENTAGE, 0);
-        database.insert(DatabaseHelper.TABLE_GOALS, null, contentValues);
-    }*/
+
     public void insert(String key, int value, String date, int userId){
 
         ContentValues contentValues = new ContentValues();
