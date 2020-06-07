@@ -12,6 +12,7 @@ public class Goal implements Parcelable {
     private Date date;
     private User user;
     private int percentage;
+    private double currentValue;
 
     public Goal(){}
 
@@ -119,4 +120,11 @@ public class Goal implements Parcelable {
         this.date = date;
     }
 
+    public double getCurrentValue() {
+        return currentValue;
+    }
+
+    public void setCurrentValue(double currentValue) {
+        this.currentValue = currentValue;
+    }
 }

@@ -1,5 +1,7 @@
 package com.example.pma.services;
 
+import com.example.pma.model.GoalRequest;
+import com.example.pma.model.GoalResponse;
 import com.example.pma.model.LoginRequest;
 import com.example.pma.model.LoginResponse;
 import com.example.pma.model.User;

@@ -1,6 +1,7 @@
 package com.example.pma;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.Placeholder;
 import androidx.fragment.app.DialogFragment;
 
 import android.content.Context;
@@ -18,8 +19,11 @@ import android.widget.Toast;
 import com.example.pma.database.DatabaseManagerGoal;
 import com.example.pma.database.DatabaseManagerRoute;
 import com.example.pma.model.Goal;
+import com.example.pma.model.GoalRequest;
+import com.example.pma.model.GoalResponse;
 import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
+import com.example.pma.services.GoalPlaceholder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -41,6 +45,8 @@ public class CreateGoalActivity extends AppCompatActivity {
     private SharedPreferences preferences;
     Retrofit retrofit;
     private AuthPlaceholder service;
+    private GoalPlaceholder goalService;
+
     private int id;
     public static final String GOAL_RESULT = "GOAL_RESULT";
     private static final String TAG = "CreateGoalActivity";
@@ -68,9 +74,15 @@ public class CreateGoalActivity extends AppCompatActivity {
         EditText valueEditText = (EditText)findViewById(R.id.goal_value);
         value = Integer.parseInt(valueEditText.getText().toString());
         key = (String) spinner.getSelectedItem();
+        goalService = retrofit.create(GoalPlaceholder.class);
+        Date goalDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+        // TODO: Just add later id of goal not 1
+        Goal goal = new Goal(Long.parseLong("1"), value, key, goalDate);
+        String token = "";
+
 
         if(preferences.contains("token") ) {
-            String token = preferences.getString("token",null);
+             token = preferences.getString("token",null);
             service = retrofit.create(AuthPlaceholder.class);
 
             Call<UserResponse> call = service.getLoggedUser("Bearer "+token);
@@ -83,6 +95,8 @@ public class CreateGoalActivity extends AppCompatActivity {
                             id = response.body().getId();
                             dbManager.insert(key, value, date, id);
 
+
+
                         }
                     }
                 }
@@ -92,11 +106,36 @@ public class CreateGoalActivity extends AppCompatActivity {
                 }
             });
         }
+
+
+        GoalRequest goalReq = new GoalRequest(date,key.toUpperCase(),value,(long)id,0);
+        Log.d(TAG," token  je"+token);
+
+        Call<GoalResponse> callGoal = goalService.addGoal(goalReq,"Bearer "+token);
+        callGoal.enqueue(new Callback<GoalResponse>() {
+            @Override
+            public void onResponse(Call<GoalResponse> call, Response<GoalResponse> response) {
+                Log.d(TAG," kod je"+response.code());
+
+                if (response.isSuccessful()) {
+                    Log.d(TAG," uspjesno  je"+response.code());
+
+                    if(response.code() == 200){
+                        Log.d(TAG," vratio se posle dodavanja "+response.code());
+
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<GoalResponse> call, Throwable t) {
+                Log.d(TAG," neuspesno");
+
+            }
+        });
+
         Intent intent  = new Intent();
 
-        Date goalDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
-        // TODO: Just add later id of goal not 1
-        Goal goal = new Goal(Long.parseLong("1"), value, key, goalDate);
+
         intent.putExtra(GOAL_RESULT, goal);
         setResult(RESULT_OK, intent);
         finish();

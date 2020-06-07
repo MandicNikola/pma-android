@@ -42,39 +42,10 @@ public class RegisterActivity extends AppCompatActivity {
                 .baseUrl("https://pma-app-19.herokuapp.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        //za testiranje baze
-        dbManager = new DatabaseManagerRoute(this);
-        dbManager.open();
 
     }
-    //za testiranje baze
 
-    public void testDatabase(View view) {
-        dbManager.insert(32,22,"bla");
-        testInsert();
-    }
-    public void testInsert(){
-
-        Cursor cursor = dbManager.fetch();
-        cursor.moveToFirst();
-        //index krece od 1
-        CharSequence mess = "Unos goal "+cursor.getString(2);
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(context, mess, duration);
-        toast.show();
-    }
-    public void testUpdate(View w){
-        Cursor c = dbManager.testQuery();
-           String column1 = c.getString(0);
-                CharSequence mess = "Update goal " + column1;
-                Context context = getApplicationContext();
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(context, mess, duration);
-                toast.show();
-
-    }
-    public void registerUser(View view) {
+        public void registerUser(View view) {
         service = retrofit.create(AuthPlaceholder.class);
         String userName = ((EditText)findViewById(R.id.firstName)).getText().toString();
         String userLastName = ((EditText)findViewById(R.id.lastName)).getText().toString();
