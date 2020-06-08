@@ -14,6 +14,8 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.pma.database.DatabaseManagerGoal;
+import com.example.pma.database.DatabaseManagerProfile;
 import com.example.pma.database.DatabaseManagerRoute;
 import com.example.pma.dialogues.MessageDialogue;
 import com.example.pma.model.User;
@@ -31,13 +33,16 @@ public class RegisterActivity extends AppCompatActivity {
     private Retrofit retrofit;
     private AuthPlaceholder service;
     //za testiranje baze
-    private DatabaseManagerRoute dbManager;
 
+    private DatabaseManagerProfile dbManagerProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        dbManagerProfile = new DatabaseManagerProfile(this);
+        dbManagerProfile.open();
+
         retrofit = new Retrofit.Builder()
                 .baseUrl("https://pma-app-19.herokuapp.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -62,7 +67,8 @@ public class RegisterActivity extends AppCompatActivity {
                     if(response.code() == 200) {
                         MessageDialogue dialog = new MessageDialogue("You have successfully registered", "Notification");
                         dialog.show(getSupportFragmentManager(), "example dialog");
-
+                        int id = response.body().getId();
+                        dbManagerProfile.insert(170,60, id);
                         new Handler().postDelayed(new Runnable() {
 
                             @Override
@@ -70,7 +76,6 @@ public class RegisterActivity extends AppCompatActivity {
                                 // your code to start second activity. Will wait for 3 seconds before calling this method
                                 Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                                 startActivity(intent);
-
                             }
                         }, 2000);
                     }
