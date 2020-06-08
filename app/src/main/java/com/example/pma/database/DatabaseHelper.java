@@ -40,13 +40,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String ROUTE_ID = "route_id";
     public static final String GOAL_USER = "userId";
     public static final String PERCENTAGE = "percentage";
-<<<<<<< HEAD
     public static final String HEIGHT = "height";
     public static final String WEIGHT = "weight";
     public static final String USER_ID = "user_id";
-=======
     public static final String REACHED_VALUE = "reached_value";
->>>>>>> a0f060a7a631991d4f8ef7ca00792f8f88603870
 
     /*
  String CREATE_POSTS_TABLE = "CREATE TABLE " + TABLE_POSTS +
