@@ -27,7 +27,7 @@ public interface AuthPlaceholder {
     Call<UserResponse> getLoggedUser(@Header("Authorization") String token);
     @GET("users/profile")
     Call<Profile> getProfile(@Header("Authorization") String token);
-    @PATCH("users/updateProfile/{username}")
-    Call<LoginResponse> updateProfile(@Body Profile profile, @Path("username") String username);
+    @PATCH("users/updateProfile")
+    Call<HashMap<String, String>> updateProfile(@Body Profile profile, @Header("Authorization") String token);
 
 }

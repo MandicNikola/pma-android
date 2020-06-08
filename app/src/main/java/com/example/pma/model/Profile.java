@@ -1,6 +1,7 @@
 package com.example.pma.model;
 
 public class Profile {
+
     private String username;
     private String firstname;
     private String lastname;

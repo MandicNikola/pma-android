@@ -2,6 +2,7 @@ package com.example.pma;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,10 +13,13 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.example.pma.model.LoginResponse;
+import com.example.pma.database.DatabaseManagerGoal;
+import com.example.pma.database.DatabaseManagerProfile;
+import com.example.pma.dialogues.MessageDialogue;
 import com.example.pma.model.Profile;
-import com.example.pma.model.User;
 import com.example.pma.services.AuthPlaceholder;
+
+import java.util.HashMap;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,12 +36,12 @@ public class ProfileActivity extends AppCompatActivity {
     EditText editEmail;
     EditText editHeight;
     EditText editWeight;
-
+    private DatabaseManagerProfile dbManager;
     private SharedPreferences preferences;
     Retrofit retrofit;
     private AuthPlaceholder service;
     private static final String TAG = "ProfileActivity";
-
+    private String token = "";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +56,8 @@ public class ProfileActivity extends AppCompatActivity {
          editEmail = (EditText)findViewById(R.id.email_data);
          editHeight = (EditText)findViewById(R.id.height_data);
          editWeight = (EditText)findViewById(R.id.weight_data);
+         dbManager = new DatabaseManagerProfile(this);
+         dbManager.open();
 
         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
 
@@ -60,7 +66,7 @@ public class ProfileActivity extends AppCompatActivity {
         spinnerGender.setAdapter(adapterGender);
 
         if(preferences.contains("token") ) {
-            String token = preferences.getString("token",null);
+            token = preferences.getString("token",null);
             service = retrofit.create(AuthPlaceholder.class);
 
             Call<Profile> call = service.getProfile("Bearer "+token);
@@ -101,9 +107,36 @@ public class ProfileActivity extends AppCompatActivity {
             valid = false;
         }
         if(valid){
+            if(!token.isEmpty()){
+                Profile userProfile = new Profile();
+                userProfile.setFirstname(editName.getText().toString());
+                userProfile.setLastname(editSurname.getText().toString());
+                userProfile.setEmail(editEmail.getText().toString());
+                userProfile.setHeight(Double.parseDouble(editHeight.getText().toString()));
+                userProfile.setWeight(Double.parseDouble(editWeight.getText().toString()));
+                userProfile.setGender(spinnerGender.getSelectedItem().toString());
+                Call<HashMap<String, String>> update = service.updateProfile(userProfile,"Bearer "+token);
+                update.enqueue(new Callback<HashMap<String, String>>() {
+                    @Override
+                    public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
+                        if(response.code() == 200){
+                            MessageDialogue dialog = new MessageDialogue("Profile is updated", "Notification");
+                            dialog.show(getSupportFragmentManager(), "Profile");
+                            startActivity(new Intent(ProfileActivity.this, RouteActivity.class));
+                        }else{
+                            MessageDialogue dialog = new MessageDialogue("There was a problem with updating, please try again", "Notification");
+                            dialog.show(getSupportFragmentManager(), "Profile");
+                        }
+                    }
 
+                    @Override
+                    public void onFailure(Call<HashMap<String, String>> call, Throwable t) {
+                        MessageDialogue dialog = new MessageDialogue("There was a problem with updating, please try again", "Notification");
+                        dialog.show(getSupportFragmentManager(), "Profile");
+                    }
+                });
+            }
         }
-
     }
     public boolean isEmpty(String text){
         return TextUtils.isEmpty(text);

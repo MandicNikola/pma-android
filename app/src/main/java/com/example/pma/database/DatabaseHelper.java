@@ -12,7 +12,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String TABLE_USERS = "users";
     public static final String TABLE_ROUTES = "routes";
     public static final String TABLE_POINTS = "points";
-    public static final String TABLE_SETTINGS = "settings";
+    public static final String TABLE_PROFILE = "profiles";
 
     public static final String FIRSTNAME = "firstname";
     public static final String LASTNAME = "lastname";
@@ -33,6 +33,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String ROUTE_ID = "route_id";
     public static final String GOAL_USER = "userId";
     public static final String PERCENTAGE = "percentage";
+    public static final String HEIGHT = "height";
+    public static final String WEIGHT = "weight";
 
     /*
  String CREATE_POSTS_TABLE = "CREATE TABLE " + TABLE_POSTS +
@@ -62,10 +64,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 PASSWORD + " TEXT"+
             ");";
 
-    private static final String CREATE_SETTINGS = " create table " + TABLE_SETTINGS+
+    private static final String CREATE_PROFILE = " create table " + TABLE_PROFILE+
             "("+
                 _ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
-                WATER_REMINDER+" ,BOOLEAN"+
+                HEIGHT +" REAL, "+
+                WEIGHT + " REAL" +
             ");";
 
     private static final String CREATE_ROUTES = " create table " + TABLE_ROUTES+
@@ -92,7 +95,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_GOALS);
         db.execSQL(CREATE_POINTS);
         db.execSQL(CREATE_ROUTES);
-        db.execSQL(CREATE_SETTINGS);
+        db.execSQL(CREATE_PROFILE);
         db.execSQL(CREATE_USERS);
     }
 
@@ -102,7 +105,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // Simplest implementation is to drop all old tables and recreate them
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_POINTS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_ROUTES);
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_SETTINGS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_PROFILE);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_GOALS);
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
             onCreate(db);
