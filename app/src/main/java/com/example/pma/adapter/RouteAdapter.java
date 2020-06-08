@@ -77,7 +77,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> 
                 mIdText.setTextColor(context.getResources().getColor(R.color.intesive));
                 imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.intense_circle));
             }
-            mDistanceText.setText("Distance: " + currentRoute.getDistance() + " " + currentRoute.getUnit() );
+            mDistanceText.setText("Distance: " + currentRoute.getDistance() + " m" );
             mCaloriesText.setText("Calories: " + currentRoute.getCalories() + " " + "cal");
         }
 

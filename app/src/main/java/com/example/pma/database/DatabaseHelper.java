@@ -28,14 +28,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String CALORIES = "calories";
     public static final String DISTANCE = "distance";
     public static final String UNIT = "unit";
+    public static final String SYNCHRONIZED_ID ="synchronized_id";
+
+    public static final String START_DATE ="start_date";
+    public static final String END_DATE ="end_date";
+
     public static final String LONGITUDE = "longitude";
     public  static final String LATITUDE = "latitude";
+    public static final String CURRENT_TIME ="current_time";
+
     public static final String ROUTE_ID = "route_id";
     public static final String GOAL_USER = "userId";
     public static final String PERCENTAGE = "percentage";
+<<<<<<< HEAD
     public static final String HEIGHT = "height";
     public static final String WEIGHT = "weight";
     public static final String USER_ID = "user_id";
+=======
+    public static final String REACHED_VALUE = "reached_value";
+>>>>>>> a0f060a7a631991d4f8ef7ca00792f8f88603870
 
     /*
  String CREATE_POSTS_TABLE = "CREATE TABLE " + TABLE_POSTS +
@@ -48,7 +59,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String CREATE_GOALS = " create table " + TABLE_GOALS +
         "("+
             _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            VALUE + " INTEGER, " +
+            VALUE + " REAL, " +
+            REACHED_VALUE + " REAL, " +
             GOAL_USER + " INTEGER, " +
             PERCENTAGE + " INTEGER, " +
             KEY + " TEXT, " +
@@ -78,7 +90,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 _ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
                 CALORIES +" REAL, " +
                 DISTANCE +" REAL, " +
-                UNIT + " TEXT"+
+                UNIT + " TEXT, "+
+                SYNCHRONIZED_ID + " REAL, "+
+                START_DATE + " TEXT, "+
+                END_DATE + " TEXT "+
               ");";
 
     public static final String CREATE_POINTS = "create table "+TABLE_POINTS +
@@ -86,6 +101,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 LONGITUDE + " REAL, " +
                 LATITUDE + " REAL, " +
+                CURRENT_TIME +" TEXT, " +
                 ROUTE_ID + " INTEGER"+
              ");";
     public DatabaseHelper(Context context){

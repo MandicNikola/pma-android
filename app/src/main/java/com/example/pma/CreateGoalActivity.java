@@ -93,7 +93,7 @@ public class CreateGoalActivity extends AppCompatActivity {
                     if (response.isSuccessful()) {
                         if(response.code() == 200){
                             id = response.body().getId();
-                            dbManager.insert(key, value, date, id);
+                            dbManager.insert(key, value, date, id,0);
 
 
 
@@ -155,9 +155,6 @@ public class CreateGoalActivity extends AppCompatActivity {
         String year_string = Integer.toString(year);
         Date goalDate = new Date();
         date = year_string+"-"+month_string+"-"+day_string;
-        String dateMessage = (month_string +
-                "/" + day_string + "/" + year_string);
-        Toast.makeText(this, "Date: " + dateMessage,
-                Toast.LENGTH_SHORT).show();
+
     }
 }

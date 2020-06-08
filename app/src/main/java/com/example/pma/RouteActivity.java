@@ -10,11 +10,13 @@ import android.view.View;
 import android.view.Menu;
 
 import com.example.pma.adapter.RouteAdapter;
+import com.example.pma.database.DatabaseManagerRoute;
 import com.example.pma.model.Route;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
@@ -36,6 +38,8 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
     private RouteAdapter routeAdapter;
     private static final String TAG = "RouteActivity";
     private SharedPreferences preferences;
+    private DatabaseManagerRoute dbManager;
+
 
 
     @Override
@@ -45,6 +49,9 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
+        dbManager = new DatabaseManagerRoute(this);
+        dbManager.open();
+        routes = dbManager.getRoutes();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -96,15 +103,13 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
 
         if(savedInstanceState != null) {
             routes = savedInstanceState.getParcelableArrayList("route");
-        } else {
-            routes = new ArrayList<>();
         }
 
         routeAdapter = new RouteAdapter(this, routes);
 
         recyclerView.setAdapter(routeAdapter);
+        routeAdapter.notifyDataSetChanged();
 
-        if(routes.size() == 0) dummyDataInit();
 
     }
 
@@ -178,20 +183,4 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
         outState.putParcelableArrayList("route", routes);
         super.onSaveInstanceState(outState);
     }
-
-    public void dummyDataInit() {
-        routes.clear();
-
-        Route route1 = new Route(Long.parseLong("1"), 400, 3000, "m");
-        Route route2 = new Route(Long.parseLong("2"), 800, 3100, "m");
-        Route route3 = new Route(Long.parseLong("3"), 2200, 3200, "km");
-        Route route4 = new Route(Long.parseLong("4"), 1400, 3300, "m");
-
-        routes.add(route1);
-        routes.add(route2);
-        routes.add(route3);
-        routes.add(route4);
-
-        routeAdapter.notifyDataSetChanged();
-
-    }}
+}

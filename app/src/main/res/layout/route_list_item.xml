@@ -31,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/route_calories"
-            android:text="3000m" />
+            android:text="3000 m" />
 
         <ImageView
             android:id="@+id/circle_img"
