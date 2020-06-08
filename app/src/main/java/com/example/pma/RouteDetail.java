@@ -6,13 +6,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
+import com.example.pma.database.DatabaseManagerPoint;
+import com.example.pma.database.DatabaseManagerRoute;
 import com.example.pma.model.Route;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.LineString;
 import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -22,7 +27,14 @@ import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 
+import java.text.DecimalFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 public class RouteDetail extends AppCompatActivity implements OnMapReadyCallback {
@@ -36,11 +48,31 @@ public class RouteDetail extends AppCompatActivity implements OnMapReadyCallback
     private MapView mapView;
     private MapboxMap mapboxMap;
 
+    private Route route;
+    private List points = new ArrayList<com.example.pma.model.Point>();
 
+    private DatabaseManagerRoute managerRoute;
+    private DatabaseManagerPoint managerPoint;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = getIntent();
+        if(intent.getLongExtra("route", 0) != 0) {
+            managerRoute = new DatabaseManagerRoute(this);
+            managerRoute.open();
+            managerPoint = new DatabaseManagerPoint(this);
+            managerPoint.open();
+
+            Long id = intent.getLongExtra("route", 0);
+            route = managerRoute.getRoute(id);
+
+            points = managerPoint.getRoutePoints(id);
+            managerPoint.close();
+            managerRoute.close();
+        }
+
         // map init flow
         Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
 
@@ -57,14 +89,12 @@ public class RouteDetail extends AppCompatActivity implements OnMapReadyCallback
         toDateText = findViewById(R.id.date_to);
         headerText = findViewById(R.id.route_header);
 
-
-
-        Intent intent = getIntent();
-        if(intent.getParcelableExtra("route") != null) {
-            Route route = intent.getParcelableExtra("route");
-            caloriesText.setText(route.getCalories() + " cal");
-            distanceText.setText(route.getDistance() + " " + route.getUnit());
-            headerText.setText("Route #" + route.getId() + " Details");
+        if(route != null) {
+            DecimalFormat decimalFormat = new DecimalFormat("#.00");
+            caloriesText.setText(decimalFormat.format(route.getCalories()) + " cal");
+            distanceText.setText(decimalFormat.format(route.getDistance()) + " m");
+            toDateText.setText(route.getEnd_time());
+            fromDateText.setText(route.getStart_time());
         }
     }
 
@@ -114,6 +144,14 @@ public class RouteDetail extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
         mapboxMap.setStyle(Style.MAPBOX_STREETS, style -> {
+            if(points.size() > 1) {
+                com.example.pma.model.Point point = (com.example.pma.model.Point) points.get(0);
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(point.getLatitude(), point.getLongitude()))
+                        .zoom(15)
+                        .build();
+                mapboxMap.setCameraPosition(cameraPosition);
+            }
 
             // Map is set up and the style has loaded. Now you can add data or make other map adjustments
             style.addSource(drawLines());
@@ -133,20 +171,11 @@ public class RouteDetail extends AppCompatActivity implements OnMapReadyCallback
     public GeoJsonSource drawLines() {
         List route = new ArrayList<Point>();
 
-        route.add(Point.fromLngLat( 19.850329868495464,
-                45.25833272840828));
-        route.add(Point.fromLngLat( 19.853881699964404,
-                45.258505563251674));
-        route.add(Point.fromLngLat( 19.853894859552383,
-                45.258485530503094));
-        route.add(Point.fromLngLat( 19.853800479322672,
-                45.258491984568536));
-//        route.add(Point.fromLngLat( -122.65631,
-//                45.52104));
-//        route.add(Point.fromLngLat( -122.6578,
-//                45.51935));
-//        route.add(Point.fromLngLat( -122.65867,
-//                45.51848));
+        Collections.sort(this.points);
+
+        for(Object p: this.points) {
+            route.add(Point.fromLngLat(((com.example.pma.model.Point) p).getLongitude(), ((com.example.pma.model.Point) p).getLatitude()));
+        }
 
         LineString lineString = LineString.fromLngLats(route);
 

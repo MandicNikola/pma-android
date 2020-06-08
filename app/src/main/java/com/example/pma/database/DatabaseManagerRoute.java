@@ -64,13 +64,12 @@ public class DatabaseManagerRoute {
         int i = database.update(DatabaseHelper.TABLE_ROUTES,contentValues,DatabaseHelper._ID + " = "+id,null);
         return i ;
     }
-    public  void delete(long id){
+    public void delete(long id){
         database.delete(DatabaseHelper.TABLE_ROUTES,DatabaseHelper._ID+" = "+ id,null);
     }
 
     public ArrayList<Route> getRoutes(){
         ArrayList<Route> routes = new ArrayList<>();
-        Log.d(TAG, "Stigao u getRoutes");
 
         String ROUTE_SELECT_QUERY = String.format("SELECT * FROM %s ;", DatabaseHelper.TABLE_ROUTES);
         Cursor cursor = database.rawQuery(ROUTE_SELECT_QUERY, null);
@@ -108,6 +107,43 @@ public class DatabaseManagerRoute {
             }
         }
         return routes;
+    }
+
+    public Route getRoute(Long id) {
+        Cursor cursor = database.rawQuery("select * from " + DatabaseHelper.TABLE_ROUTES + " where " + DatabaseHelper._ID + "=" +id + ";", null);
+        Route route = new Route();
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    route.setId(Long.parseLong(cursor.getString(cursor.getColumnIndex(dbHelper._ID))));
+                    Log.d(TAG, cursor.getString(cursor.getColumnIndex(dbHelper._ID)));
+
+                    route.setCalories(Double.parseDouble(cursor.getString(cursor.getColumnIndex(dbHelper.CALORIES))));
+                    Log.d(TAG, cursor.getString(cursor.getColumnIndex(dbHelper.CALORIES)));
+
+                    route.setDistance(Double.parseDouble(cursor.getString(cursor.getColumnIndex(dbHelper.DISTANCE))));
+                    Log.d(TAG, cursor.getString(cursor.getColumnIndex(dbHelper.DISTANCE)));
+
+                    route.setEnd_time(cursor.getString(cursor.getColumnIndex(dbHelper.END_DATE)));
+                    route.setStart_time(cursor.getString(cursor.getColumnIndex(dbHelper.START_DATE)));
+                    route.setSynchronized_id(Long.parseLong(cursor.getString(cursor.getColumnIndex(dbHelper.SYNCHRONIZED_ID))));
+
+                    // String dateStringEnd = cursor.getString(cursor.getColumnIndex(dbHelper.END_DATE));
+                    //String dateStringStart = cursor.getString(cursor.getColumnIndex(dbHelper.START_DATE));
+
+                    //Log.d(TAG, " date "+dateStringEnd + " - " + dateStringStart);
+                    //  Date dateEnd = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(dateStringEnd);
+                    // Date dateStart = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(dateStringStart);
+                } while(cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "Error while trying to get routes from database");
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return route;
     }
 
 }

@@ -85,7 +85,7 @@ public class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.ViewHolder> 
         public void onClick(View v) {
             Route currentRoute = routesData.get(getAdapterPosition());
             Intent intent = new Intent(context, RouteDetail.class);
-            intent.putExtra("route", currentRoute);
+            intent.putExtra("route", currentRoute.getId());
             context.startActivity(intent);
         }
     }

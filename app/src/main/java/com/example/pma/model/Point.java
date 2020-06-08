@@ -1,10 +1,14 @@
 package com.example.pma.model;
 
-public class Point {
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
+public class Point  implements  Comparable<Point>{
     private long id;
-    private float longitude;
-    private float latitude;
+    private double longitude;
+    private double latitude;
     private long route_id;
+    private String dateTime;
 
     public  Point(){
         super();
@@ -24,19 +28,19 @@ public class Point {
         this.id = id;
     }
 
-    public float getLongitude() {
+    public double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(float longitude) {
+    public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
-    public float getLatitude() {
+    public double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(float latitude) {
+    public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
@@ -48,4 +52,23 @@ public class Point {
         this.route_id = route_id;
     }
 
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    @Override
+    public int compareTo(Point o) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+        try {
+            return simpleDateFormat.parse(getDateTime()).compareTo(simpleDateFormat.parse(o.getDateTime()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }

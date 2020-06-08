@@ -5,6 +5,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import com.example.pma.model.Point;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseManagerPoint {
     private DatabaseHelper dbHelper;
@@ -23,7 +30,7 @@ public class DatabaseManagerPoint {
         dbHelper.close();
     }
 
-    public long insert(float longitude,float latitude,long route_id, String currentTime){
+    public long insert(double longitude,double latitude,long route_id, String currentTime){
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.LONGITUDE,longitude);
         contentValues.put(DatabaseHelper.LATITUDE,latitude);
@@ -57,4 +64,28 @@ public class DatabaseManagerPoint {
         database.delete(DatabaseHelper.TABLE_POINTS,DatabaseHelper._ID+" = "+ id,null);
     }
 
+    public List getRoutePoints(Long id) {
+        Cursor cursor = database.rawQuery("select * from " + DatabaseHelper.TABLE_POINTS + " where " + DatabaseHelper.ROUTE_ID + "=" +id + ";", null);
+        List points = new ArrayList<Point>();
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    Point point = new Point();
+
+                    point.setId(Long.parseLong(cursor.getString(cursor.getColumnIndex(dbHelper._ID))));
+                    point.setLongitude(cursor.getDouble(cursor.getColumnIndex(dbHelper.LONGITUDE)));
+                    point.setLatitude((cursor.getDouble(cursor.getColumnIndex(dbHelper.LATITUDE))));
+                    point.setDateTime(cursor.getString(cursor.getColumnIndex(dbHelper.CURRENT_TIME)));
+                    points.add(point);
+                } while(cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.d("AAAA", "Error while trying to get points from database");
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return points;
+    }
 }

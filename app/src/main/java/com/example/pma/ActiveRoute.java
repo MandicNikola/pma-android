@@ -317,7 +317,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             for(int i = 0 ;i< locations.size();i++){
                 Location location = (Location) locations.get(i);
                 Date current_time = new Date(location.getTime());
-                String current_time_string = simpleDateFormat.format(start_date);
+                String current_time_string = simpleDateFormat.format(current_time);
                 long idPoint = dbManagerPoint.insert((float)location.getLongitude(),(float)location.getLatitude(),id,current_time_string);
             }
             startTracking = false;
@@ -327,6 +327,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     public void onLocationChanged(Location location) {
         if(location != null) {
+            this.lat = location.getLatitude();
+            this.lng = location.getLongitude();
+
             Double lng = location.getLongitude();
             Double lat = location.getLatitude();
 
@@ -381,8 +384,8 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         for(int i = 0 ;i< locations.size();i++){
             Location location = (Location) locations.get(i);
             Date current_time = new Date(location.getTime());
-            String current_time_string = simpleDateFormat.format(start_date);
-            long idPoint = dbManagerPoint.insert((float)location.getLongitude(),(float)location.getLatitude(),id,current_time_string);
+            String current_time_string = simpleDateFormat.format(current_time);
+            long idPoint = dbManagerPoint.insert(location.getLongitude(), location.getLatitude(),id,current_time_string);
         }
         Date endDateRoute=new SimpleDateFormat("yyyy-MM-dd").parse(strDate1);
 
@@ -417,6 +420,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
         view.setVisibility(View.GONE);
         finishButton.setVisibility(View.VISIBLE);
+        initMapCenter();
         this.startTracking = true;
     }
 }
