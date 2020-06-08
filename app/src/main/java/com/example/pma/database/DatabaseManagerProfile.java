@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.example.pma.model.Goal;
+import com.example.pma.model.Profile;
+import com.example.pma.model.ProfileDB;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,11 +33,12 @@ public class DatabaseManagerProfile {
     public void close(){
         dbHelper.close();
     }
-    public void insert(double height, double weight){
+    public void insert(double height, double weight, int user_id){
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.HEIGHT, height);
         contentValues.put(DatabaseHelper.WEIGHT, weight);
+        contentValues.put(DatabaseHelper.USER_ID, user_id);
         database.insert(DatabaseHelper.TABLE_PROFILE, null, contentValues);
     }
     public Cursor fetch(){
@@ -47,15 +50,56 @@ public class DatabaseManagerProfile {
         return  cursor;
 
     }
-    public int update(long id, double height, double weight){
+    public int getProfileId(int userId){
+        Cursor cursor = database.rawQuery("select "+DatabaseHelper._ID+" from "+DatabaseHelper.TABLE_PROFILE + " where " + DatabaseHelper.USER_ID + " = " +userId+";" , null);
+       int id=0;
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    id = Integer.parseInt(cursor.getString(cursor.getColumnIndex(dbHelper._ID)));
+                } while(cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "Error while trying to get id from database");
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return  id;
+}
+    public int update( double height, double weight, int user_id){
+        int idRow = getProfileId(user_id);
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.HEIGHT, height);
         contentValues.put(DatabaseHelper.WEIGHT, weight);
-        int i = database.update(DatabaseHelper.TABLE_PROFILE, contentValues,DatabaseHelper._ID + " = "+id,null);
+        contentValues.put(DatabaseHelper.USER_ID, user_id);
+        int i = database.update(DatabaseHelper.TABLE_PROFILE, contentValues,DatabaseHelper._ID + " = "+idRow,null);
         return i ;
     }
+
     public  void delete(long id){
         database.delete(DatabaseHelper.TABLE_PROFILE,DatabaseHelper._ID+" = "+ id,null);
+    }
+    public ProfileDB getProfileByUserId(int id){
+        Cursor cursor = database.rawQuery("select * from "+DatabaseHelper.TABLE_PROFILE + " where " + DatabaseHelper.USER_ID + " = " +id+";" , null);
+        ProfileDB profile = new ProfileDB();
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    profile.setWeight(Double.parseDouble(cursor.getString(cursor.getColumnIndex(dbHelper.WEIGHT))));
+                    profile.setHeight(Double.parseDouble(cursor.getString(cursor.getColumnIndex(dbHelper.HEIGHT))));
+                    profile.setUser_id(cursor.getInt(cursor.getColumnIndex(dbHelper.USER_ID)));
+                } while(cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "Error while trying to get profile from database");
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return profile;
     }
 
 }

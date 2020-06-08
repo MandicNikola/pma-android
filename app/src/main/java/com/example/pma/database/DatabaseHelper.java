@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    static final String DB_NAME = "ANDROID_DATABASE_PMA1.DB";
+    static final String DB_NAME = "ANDROID_DATABASE_PMA5.DB";
     static final int DB_VERSION = 1;
     public static final String TABLE_GOALS = "goals";
     public static final String TABLE_USERS = "users";
@@ -35,6 +35,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String PERCENTAGE = "percentage";
     public static final String HEIGHT = "height";
     public static final String WEIGHT = "weight";
+    public static final String USER_ID = "user_id";
 
     /*
  String CREATE_POSTS_TABLE = "CREATE TABLE " + TABLE_POSTS +
@@ -68,7 +69,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             "("+
                 _ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
                 HEIGHT +" REAL, "+
-                WEIGHT + " REAL" +
+                WEIGHT + " REAL," +
+                USER_ID + " INTEGER"+
             ");";
 
     private static final String CREATE_ROUTES = " create table " + TABLE_ROUTES+

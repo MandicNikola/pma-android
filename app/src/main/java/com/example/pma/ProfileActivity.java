@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
@@ -17,6 +18,8 @@ import com.example.pma.database.DatabaseManagerGoal;
 import com.example.pma.database.DatabaseManagerProfile;
 import com.example.pma.dialogues.MessageDialogue;
 import com.example.pma.model.Profile;
+import com.example.pma.model.ProfileDB;
+import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
 
 import java.util.HashMap;
@@ -42,6 +45,7 @@ public class ProfileActivity extends AppCompatActivity {
     private AuthPlaceholder service;
     private static final String TAG = "ProfileActivity";
     private String token = "";
+    private Integer userId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +72,20 @@ public class ProfileActivity extends AppCompatActivity {
         if(preferences.contains("token") ) {
             token = preferences.getString("token",null);
             service = retrofit.create(AuthPlaceholder.class);
+            Call<UserResponse> callLoggedUser = service.getLoggedUser("Bearer "+token);
+            callLoggedUser.enqueue(new Callback<UserResponse>() {
+                @Override
+                public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                    if(response.code() == 200) {
+                        userId = response.body().getId();
+                    }
+                }
 
+                @Override
+                public void onFailure(Call<UserResponse> call, Throwable t) {
+
+                }
+            });
             Call<Profile> call = service.getProfile("Bearer "+token);
             call.enqueue(new Callback<Profile>() {
                 @Override
@@ -120,9 +137,13 @@ public class ProfileActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
                         if(response.code() == 200){
+
+                            ProfileDB profileDB = dbManager.getProfileByUserId(userId);
+                            Log.d("Profile Activity","informacije "+profileDB.getUser_id());
+                            dbManager.update(Double.parseDouble(editHeight.getText().toString()),Double.parseDouble(editWeight.getText().toString()),profileDB.getUser_id());
                             MessageDialogue dialog = new MessageDialogue("Profile is updated", "Notification");
                             dialog.show(getSupportFragmentManager(), "Profile");
-                            startActivity(new Intent(ProfileActivity.this, RouteActivity.class));
+
                         }else{
                             MessageDialogue dialog = new MessageDialogue("There was a problem with updating, please try again", "Notification");
                             dialog.show(getSupportFragmentManager(), "Profile");
