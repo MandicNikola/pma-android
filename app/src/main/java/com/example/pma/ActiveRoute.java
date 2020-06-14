@@ -415,7 +415,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         startActivity(intent);
 
     }
+    public void updateGoal(){
 
+    }
     public void onStartClick(View view) {
 
         view.setVisibility(View.GONE);
