@@ -3,8 +3,12 @@ package com.example.pma;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
@@ -12,7 +16,6 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -21,7 +24,6 @@ import com.example.pma.database.DatabaseManagerGoal;
 import com.example.pma.database.DatabaseManagerPoint;
 import com.example.pma.database.DatabaseManagerRoute;
 import com.example.pma.model.Goal;
-import com.example.pma.model.Route;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -98,6 +100,12 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     private Button finishButton;
     private static final String TAG = "ActiveRoute";
 
+    // Notification variables
+    private static final String PRIMARY_CHANNEL_ID = "primary_notification_channel";
+
+    private NotificationManager mNotifyManager;
+
+    private static final int NOTIFICATION_ID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +157,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             }
         }
         // TODO: Need to get userSettings because need for user weight and height
+
+        // Initialization of notification channel
+        createNotificationChannel();
     }
 
     @Override
@@ -370,6 +381,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     // TODO: put route in DB
     public void onFinishClick(View view) throws ParseException {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        // TODO: Handle case when there's not locations
         Location firstLocation = (Location) locations.get(0);
         Location lastLocation = (Location) locations.get(locations.size()-1);
         Date start_date = new Date(firstLocation.getTime());
@@ -378,6 +390,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         String strDate1 = simpleDateFormat.format(start_date);
         String strDate2 = simpleDateFormat.format(end_date);
+
+        // indicator for show notification
+        boolean showNotification = false;
 
         long id = -1;
         id=dbManager.insert(this.calories,this.distance,"m",(long)-1,strDate1,strDate2);
@@ -399,6 +414,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 SimpleDateFormat simpleDateFormatGoal = new SimpleDateFormat("yyyy-MM-dd");
                 String goalDate = simpleDateFormatGoal.format(goal.getDate());
 
+                // TODO: update boolean for showing notification, also goals that are already completed should not be considered
                 if(goal.getGoalKey().equals("Distance")) {
 
                     double currentValueDistance = goal.getCurrentValue() + this.distance;
@@ -410,6 +426,12 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
         }
+
+        if(showNotification) {
+            NotificationCompat.Builder notifyBuilder = getNotificationBuilder();
+            mNotifyManager.notify(NOTIFICATION_ID, notifyBuilder.build());
+        }
+
         dbManagerGoal.close();
         Intent intent = new Intent(this, RouteActivity.class);
         startActivity(intent);
@@ -425,4 +447,37 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         initMapCenter();
         this.startTracking = true;
     }
+
+    public void createNotificationChannel() {
+        mNotifyManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >=
+                android.os.Build.VERSION_CODES.O) {
+            // Create a NotificationChannel
+            NotificationChannel notificationChannel = new NotificationChannel(PRIMARY_CHANNEL_ID,
+                    "Mascot Notification", NotificationManager
+                    .IMPORTANCE_HIGH);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.enableVibration(true);
+            notificationChannel.setDescription("Notification from Mascot");
+            mNotifyManager.createNotificationChannel(notificationChannel);
+        }
+    }
+
+    private NotificationCompat.Builder getNotificationBuilder(){
+        Intent notificationIntent = new Intent(this, MainActivity.class);
+        PendingIntent notificationPendingIntent = PendingIntent.getActivity(this,
+                NOTIFICATION_ID, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Builder notifyBuilder = new NotificationCompat.Builder(this, PRIMARY_CHANNEL_ID)
+                .setContentTitle("Good job!")
+                .setContentText("You have reached some goals.")
+                .setSmallIcon(R.drawable.ic_accessibility_black_24dp)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setAutoCancel(true)
+                .setContentIntent(notificationPendingIntent);
+        return notifyBuilder;
+    }
+
 }

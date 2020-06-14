@@ -2,10 +2,14 @@ package com.example.pma;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.example.pma.model.LoginRequest;
@@ -26,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     Retrofit retrofit;
     private AuthPlaceholder service;
 
+    private static final int NOTIFICATION_ID = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +43,24 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
+
+        Intent notifyIntent = new Intent(this, WaterReceiver.class);
+
+        PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
+                (this, NOTIFICATION_ID, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // TODO: Need to implement initialization using shared preferences for water reminder
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        long repeatInterval = AlarmManager.INTERVAL_FIFTEEN_MINUTES;
+        long triggerTime = SystemClock.elapsedRealtime()
+                + repeatInterval;
+
+        if (alarmManager != null) {
+            alarmManager.setInexactRepeating
+                    (AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                            triggerTime, repeatInterval, notifyPendingIntent);
+        }
 
         new Handler().postDelayed(new Runnable() {
 
@@ -69,5 +93,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 }
         }, 2000);
+
     }
 }
