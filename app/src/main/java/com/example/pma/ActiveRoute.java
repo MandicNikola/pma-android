@@ -16,6 +16,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -24,6 +25,8 @@ import com.example.pma.database.DatabaseManagerGoal;
 import com.example.pma.database.DatabaseManagerPoint;
 import com.example.pma.database.DatabaseManagerRoute;
 import com.example.pma.model.Goal;
+import com.example.pma.model.GoalResponse;
+import com.example.pma.services.GoalPlaceholder;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -51,6 +54,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
@@ -107,11 +116,20 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     private static final int NOTIFICATION_ID = 0;
 
+    Retrofit retrofit;
+
+    private GoalPlaceholder goalService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
         setContentView(R.layout.activity_active_route);
+        retrofit = new Retrofit.Builder()
+                .baseUrl("https://pma-app-19.herokuapp.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
         distanceValueView = (TextView)findViewById(R.id.distance_value);
         distanceValueView.setText("0 m");
         caloriesValueView = (TextView)findViewById(R.id.calories_value);
@@ -403,7 +421,18 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             long idPoint = dbManagerPoint.insert(location.getLongitude(), location.getLatitude(),id,current_time_string);
         }
         Date endDateRoute=new SimpleDateFormat("yyyy-MM-dd").parse(strDate1);
+        updateGoal(endDateRoute);
 
+        if(showNotification) {
+            NotificationCompat.Builder notifyBuilder = getNotificationBuilder();
+            mNotifyManager.notify(NOTIFICATION_ID, notifyBuilder.build());
+        }
+
+        Intent intent = new Intent(this, RouteActivity.class);
+        startActivity(intent);
+
+    }
+    public void updateGoal(Date endDateRoute){
         ArrayList<Goal> goals = new ArrayList<>();
         dbManagerGoal = new DatabaseManagerGoal(this);
         dbManagerGoal.open();
@@ -411,33 +440,77 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         goals = dbManagerGoal.getGoals();
         for(Goal goal:goals){
             if(goal.getDate().after(endDateRoute)){
+                Log.d(TAG," dosao po ciljeve");
+
+                if(goal.getNotified() == 0) {
+                    Log.d(TAG," nije notified");
                 SimpleDateFormat simpleDateFormatGoal = new SimpleDateFormat("yyyy-MM-dd");
                 String goalDate = simpleDateFormatGoal.format(goal.getDate());
 
                 // TODO: update boolean for showing notification, also goals that are already completed should not be considered
                 if(goal.getGoalKey().equals("Distance")) {
 
-                    double currentValueDistance = goal.getCurrentValue() + this.distance;
-                    dbManagerGoal.update(goal.getId(), goal.getGoalKey(), goal.getGoalValue(), goalDate, currentValueDistance);
+                        double currentValueDistance = goal.getCurrentValue() + this.distance;
+                        Log.d(TAG," u distance je");
+                        if(currentValueDistance < goal.getGoalValue()) {
+                            updateGoalBack(currentValueDistance,goal.getBackId(),0);
+
+                            dbManagerGoal.update(goal.getId(), goal.getGoalKey(), goal.getGoalValue(), goalDate, currentValueDistance, goal.getNotified(), goal.getBackId());
+                        }else{
+                            updateGoalBack(currentValueDistance,goal.getBackId(),1);
+                            dbManagerGoal.update(goal.getId(), goal.getGoalKey(), goal.getGoalValue(), goalDate, currentValueDistance, 1, goal.getBackId());
+
+                        }
                 }else{
 
-                    double currentValueCalories = goal.getCurrentValue() + this.calories;
-                    dbManagerGoal.update(goal.getId(), goal.getGoalKey(), goal.getGoalValue(), goalDate, currentValueCalories);
+                        double currentValueCalories = goal.getCurrentValue() + this.calories;
+
+                        if (currentValueCalories < goal.getGoalValue()) {
+
+                            Log.d(TAG, " calories cilj" + currentValueCalories);
+                            updateGoalBack(currentValueCalories,goal.getBackId(),0);
+
+                            dbManagerGoal.update(goal.getId(), goal.getGoalKey(), goal.getGoalValue(), goalDate, currentValueCalories, goal.getNotified(), goal.getBackId());
+                        }else{
+                            Log.d(TAG, " calories ispunjen cilj" + currentValueCalories);
+                            updateGoalBack(currentValueCalories,goal.getBackId(),1);
+
+                            dbManagerGoal.update(goal.getId(), goal.getGoalKey(), goal.getGoalValue(), goalDate, currentValueCalories, 1, goal.getBackId());
+
+                        }
+
+                    }
                 }
             }
         }
-
-        if(showNotification) {
-            NotificationCompat.Builder notifyBuilder = getNotificationBuilder();
-            mNotifyManager.notify(NOTIFICATION_ID, notifyBuilder.build());
-        }
-
         dbManagerGoal.close();
-        Intent intent = new Intent(this, RouteActivity.class);
-        startActivity(intent);
 
     }
-    public void updateGoal(){
+
+    public void updateGoalBack(double currentValue, long id,int notifiedFlag){
+        goalService = retrofit.create(GoalPlaceholder.class);
+        GoalResponse goal = new GoalResponse(id,currentValue,notifiedFlag);
+
+        Call<GoalResponse> callGoal = goalService.updateGoal(goal);
+        callGoal.enqueue(new Callback<GoalResponse>() {
+            @Override
+            public void onResponse(Call<GoalResponse> call, Response<GoalResponse> response) {
+                Log.d(TAG," kod je"+response.code());
+
+                if (response.isSuccessful()) {
+                    Log.d(TAG," uspjesno  je"+response.body().getId());
+                    if(response.code() == 200){
+                        Log.d(TAG," vratio se posle update goals back"+response.code());
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<GoalResponse> call, Throwable t) {
+                Log.d(TAG," neuspesno update goal");
+
+            }
+        });
+
 
     }
     public void onStartClick(View view) {

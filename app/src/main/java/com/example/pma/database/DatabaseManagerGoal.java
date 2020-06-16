@@ -37,7 +37,7 @@ public class DatabaseManagerGoal {
     }
 
 
-    public void insert(String key, double value, String date, int userId,double reached_value){
+    public long insert(String key, double value, String date, int userId,double reached_value,int notified,Long back_id){
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.KEY, key);
@@ -46,10 +46,15 @@ public class DatabaseManagerGoal {
         contentValues.put(DatabaseHelper.GOAL_USER, userId);
         contentValues.put(DatabaseHelper.PERCENTAGE, 0);
         contentValues.put(DatabaseHelper.REACHED_VALUE, reached_value);
-        database.insert(DatabaseHelper.TABLE_GOALS, null, contentValues);
+        contentValues.put(DatabaseHelper.NOTIFIED,notified);
+        Log.d(TAG," id od goal na frontu je"+back_id);
+
+        contentValues.put(DatabaseHelper.BACK_ID,back_id);
+       long i= database.insert(DatabaseHelper.TABLE_GOALS, null, contentValues);
+        return i;
     }
     public Cursor fetch(){
-        String[] columns  = new String[]{DatabaseHelper._ID,DatabaseHelper.VALUE,DatabaseHelper.REACHED_VALUE, DatabaseHelper.GOAL_USER,DatabaseHelper.PERCENTAGE,DatabaseHelper.KEY,DatabaseHelper.DATE};
+        String[] columns  = new String[]{DatabaseHelper._ID,DatabaseHelper.VALUE,DatabaseHelper.REACHED_VALUE, DatabaseHelper.GOAL_USER,DatabaseHelper.PERCENTAGE,DatabaseHelper.NOTIFIED,DatabaseHelper.BACK_ID,DatabaseHelper.KEY,DatabaseHelper.DATE};
         Cursor cursor = database.query(DatabaseHelper.TABLE_GOALS, columns, null,null,null,null,null);
         if(cursor != null){
             cursor.moveToFirst();
@@ -57,12 +62,15 @@ public class DatabaseManagerGoal {
         return  cursor;
 
     }
-    public int update(long id, String key, double value, String date,double reached_value){
+    public int update(long id, String key, double value, String date,double reached_value,int notified,Long back_id){
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.KEY, key);
         contentValues.put(DatabaseHelper.VALUE, value);
         contentValues.put(DatabaseHelper.DATE, date);
         contentValues.put(DatabaseHelper.REACHED_VALUE, reached_value);
+        contentValues.put(DatabaseHelper.NOTIFIED,notified);
+        contentValues.put(DatabaseHelper.BACK_ID,back_id);
+
         int i = database.update(DatabaseHelper.TABLE_GOALS,contentValues,DatabaseHelper._ID + " = "+id,null);
         return i ;
     }
@@ -92,8 +100,10 @@ public class DatabaseManagerGoal {
                     goal.setGoalKey(cursor.getString(cursor.getColumnIndex(dbHelper.KEY)));
                     goal.setGoalValue(Double.parseDouble(cursor.getString(cursor.getColumnIndex(dbHelper.VALUE))));
                     goal.setCurrentValue(Double.parseDouble(cursor.getString(cursor.getColumnIndex(dbHelper.REACHED_VALUE))));
+                    goal.setNotified(Integer.parseInt(cursor.getString(cursor.getColumnIndex(dbHelper.NOTIFIED))));
+                    goal.setBackId(Long.parseLong(cursor.getString(cursor.getColumnIndex(DatabaseHelper.BACK_ID))));
+
                     String dateString = cursor.getString(cursor.getColumnIndex(dbHelper.DATE));
-                    Log.d(TAG, " date "+dateString);
                     Date date = new SimpleDateFormat("yyyy-MM-dd").parse(dateString);
                     goal.setDate(date);
                     goals.add(goal);

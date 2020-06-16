@@ -50,7 +50,7 @@ public class CreateGoalActivity extends AppCompatActivity {
     private int id;
     public static final String GOAL_RESULT = "GOAL_RESULT";
     private static final String TAG = "CreateGoalActivity1";
-
+    private long idBack;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,8 +81,53 @@ public class CreateGoalActivity extends AppCompatActivity {
         String token = "";
 
 
+        /* Used to parse string just in case for parsing it for backend */
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date parsedDate = simpleDateFormat.parse(date);
+        GoalRequest goalReq = new GoalRequest(simpleDateFormat.format(parsedDate),key.toUpperCase(),value,(long)id,0);
         if(preferences.contains("token") ) {
-             token = preferences.getString("token",null);
+            token = preferences.getString("token",null);
+        }
+        Call<GoalResponse> callGoal = goalService.addGoal(goalReq,"Bearer "+token);
+        callGoal.enqueue(new Callback<GoalResponse>() {
+            @Override
+            public void onResponse(Call<GoalResponse> call, Response<GoalResponse> response) {
+                Log.d(TAG," kod je"+response.code());
+
+                if (response.isSuccessful()) {
+                    Log.d(TAG," uspjesno  je"+response.body().getId());
+                    idBack = response.body().getId();
+                    if(response.code() == 200){
+                        Log.d(TAG," vratio se posle dodavanja "+response.code());
+                        insertInDatabase(idBack);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<GoalResponse> call, Throwable t) {
+                Log.d(TAG," neuspesno");
+
+            }
+        });
+
+
+
+
+
+        Intent intent  = new Intent();
+
+
+        intent.putExtra(GOAL_RESULT, goal);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+    public void insertInDatabase(long backId){
+        String token = "";
+        Log.d(TAG," insert in database "+backId);
+
+
+        if(preferences.contains("token") ) {
+            token = preferences.getString("token",null);
             service = retrofit.create(AuthPlaceholder.class);
 
             Call<UserResponse> call = service.getLoggedUser("Bearer "+token);
@@ -92,10 +137,11 @@ public class CreateGoalActivity extends AppCompatActivity {
 
                     if (response.isSuccessful()) {
                         if(response.code() == 200){
-                            id = response.body().getId();
-                            dbManager.insert(key, value, date, id,0);
+                            id = response.body().getId(); Log.d(TAG," idBack "+idBack);
 
-
+                            long i =  dbManager.insert(key, value, date, id,0,0,idBack);
+                            Log.d(TAG," id od goal na frontu je"+i);
+                            //ovdje treba da upisem id od fronta na back ???
 
                         }
                     }
@@ -107,40 +153,7 @@ public class CreateGoalActivity extends AppCompatActivity {
             });
         }
 
-        /* Used to parse string just in case for parsing it for backend */
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date parsedDate = simpleDateFormat.parse(date);
-        GoalRequest goalReq = new GoalRequest(simpleDateFormat.format(parsedDate),key.toUpperCase(),value,(long)id,0);
-        Call<GoalResponse> callGoal = goalService.addGoal(goalReq,"Bearer "+token);
-        callGoal.enqueue(new Callback<GoalResponse>() {
-            @Override
-            public void onResponse(Call<GoalResponse> call, Response<GoalResponse> response) {
-                Log.d(TAG," kod je"+response.code());
-
-                if (response.isSuccessful()) {
-                    Log.d(TAG," uspjesno  je"+response.body().getId());
-
-                    if(response.code() == 200){
-                        Log.d(TAG," vratio se posle dodavanja "+response.code());
-
-                    }
-                }
-            }
-            @Override
-            public void onFailure(Call<GoalResponse> call, Throwable t) {
-                Log.d(TAG," neuspesno");
-
-            }
-        });
-
-        Intent intent  = new Intent();
-
-
-        intent.putExtra(GOAL_RESULT, goal);
-        setResult(RESULT_OK, intent);
-        finish();
     }
-
 
 
 

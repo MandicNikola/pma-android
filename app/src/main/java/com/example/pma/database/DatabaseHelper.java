@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    static final String DB_NAME = "ANDROID_DATABASE_PMA5.DB";
+    static final String DB_NAME = "ANDROID_DATABASE_PMA12.DB";
     static final int DB_VERSION = 1;
     public static final String TABLE_GOALS = "goals";
     public static final String TABLE_USERS = "users";
@@ -39,6 +39,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String ROUTE_ID = "route_id";
     public static final String GOAL_USER = "userId";
+    public static final String NOTIFIED = "notified";
+    public static final String BACK_ID = "back_id";
     public static final String PERCENTAGE = "percentage";
     public static final String HEIGHT = "height";
     public static final String WEIGHT = "weight";
@@ -60,6 +62,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             REACHED_VALUE + " REAL, " +
             GOAL_USER + " INTEGER, " +
             PERCENTAGE + " INTEGER, " +
+            NOTIFIED + " INTEGER, " +
+            BACK_ID + " REAL, " +
             KEY + " TEXT, " +
             DATE + " TEXT" +
         ");";

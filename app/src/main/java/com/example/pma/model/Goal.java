@@ -13,6 +13,8 @@ public class Goal implements Parcelable {
     private User user;
     private int percentage;
     private double currentValue;
+    private int notified;
+    private Long backId;
 
     public Goal(){}
 
@@ -126,5 +128,21 @@ public class Goal implements Parcelable {
 
     public void setCurrentValue(double currentValue) {
         this.currentValue = currentValue;
+    }
+
+    public int getNotified() {
+        return notified;
+    }
+
+    public void setNotified(int notified) {
+        this.notified = notified;
+    }
+
+    public Long getBackId() {
+        return backId;
+    }
+
+    public void setBackId(Long backId) {
+        this.backId = backId;
     }
 }
