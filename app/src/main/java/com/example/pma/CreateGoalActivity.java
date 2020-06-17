@@ -111,9 +111,6 @@ public class CreateGoalActivity extends AppCompatActivity {
         });
 
 
-
-
-
         Intent intent  = new Intent();
 
 
@@ -141,7 +138,6 @@ public class CreateGoalActivity extends AppCompatActivity {
 
                             long i =  dbManager.insert(key, value, date, id,0,0,idBack);
                             Log.d(TAG," id od goal na frontu je"+i);
-                            //ovdje treba da upisem id od fronta na back ???
 
                         }
                     }

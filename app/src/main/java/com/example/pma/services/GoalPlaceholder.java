@@ -14,7 +14,7 @@ public interface GoalPlaceholder {
     @POST("goals")
     Call<GoalResponse> addGoal(@Body GoalRequest goal, @Header("Authorization") String token);
     @PATCH("goals/updateGoal")
-    Call<GoalResponse> updateGoal(@Body GoalResponse goal);
+    Call<GoalResponse> updateGoal(@Body GoalResponse goal,@Header("Authorization") String token);
 
 
 }

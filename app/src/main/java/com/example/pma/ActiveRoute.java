@@ -10,6 +10,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -99,6 +100,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     private DatabaseManagerRoute dbManager;
     private DatabaseManagerPoint dbManagerPoint;
     private DatabaseManagerGoal dbManagerGoal;
+    private SharedPreferences preferences;
 
 
     // GOOGLE API LOCATIONS USED FOR APP
@@ -120,6 +122,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     private GoalPlaceholder goalService;
 
+    boolean showNotification = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +134,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 .baseUrl("https://pma-app-19.herokuapp.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+        preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
 
         distanceValueView = (TextView)findViewById(R.id.distance_value);
         distanceValueView.setText("0 m");
@@ -410,7 +416,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         String strDate2 = simpleDateFormat.format(end_date);
 
         // indicator for show notification
-        boolean showNotification = false;
+        showNotification = false;
 
         long id = -1;
         id=dbManager.insert(this.calories,this.distance,"m",(long)-1,strDate1,strDate2);
@@ -458,6 +464,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                             dbManagerGoal.update(goal.getId(), goal.getGoalKey(), goal.getGoalValue(), goalDate, currentValueDistance, goal.getNotified(), goal.getBackId());
                         }else{
                             updateGoalBack(currentValueDistance,goal.getBackId(),1);
+                            showNotification = true;
                             dbManagerGoal.update(goal.getId(), goal.getGoalKey(), goal.getGoalValue(), goalDate, currentValueDistance, 1, goal.getBackId());
 
                         }
@@ -467,14 +474,12 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
                         if (currentValueCalories < goal.getGoalValue()) {
 
-                            Log.d(TAG, " calories cilj" + currentValueCalories);
                             updateGoalBack(currentValueCalories,goal.getBackId(),0);
-
                             dbManagerGoal.update(goal.getId(), goal.getGoalKey(), goal.getGoalValue(), goalDate, currentValueCalories, goal.getNotified(), goal.getBackId());
                         }else{
-                            Log.d(TAG, " calories ispunjen cilj" + currentValueCalories);
-                            updateGoalBack(currentValueCalories,goal.getBackId(),1);
 
+                            updateGoalBack(currentValueCalories,goal.getBackId(),1);
+                            showNotification = true;
                             dbManagerGoal.update(goal.getId(), goal.getGoalKey(), goal.getGoalValue(), goalDate, currentValueCalories, 1, goal.getBackId());
 
                         }
@@ -490,28 +495,32 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     public void updateGoalBack(double currentValue, long id,int notifiedFlag){
         goalService = retrofit.create(GoalPlaceholder.class);
         GoalResponse goal = new GoalResponse(id,currentValue,notifiedFlag);
+        String token = "";
 
-        Call<GoalResponse> callGoal = goalService.updateGoal(goal);
-        callGoal.enqueue(new Callback<GoalResponse>() {
-            @Override
-            public void onResponse(Call<GoalResponse> call, Response<GoalResponse> response) {
-                Log.d(TAG," kod je"+response.code());
+        if(preferences.contains("token") ) {
+            token = "Bearer "+ preferences.getString("token", null);
 
-                if (response.isSuccessful()) {
-                    Log.d(TAG," uspjesno  je"+response.body().getId());
-                    if(response.code() == 200){
-                        Log.d(TAG," vratio se posle update goals back"+response.code());
+            Call<GoalResponse> callGoal = goalService.updateGoal(goal, token);
+            callGoal.enqueue(new Callback<GoalResponse>() {
+                @Override
+                public void onResponse(Call<GoalResponse> call, Response<GoalResponse> response) {
+
+                    if (response.isSuccessful()) {
+                        Log.d(TAG, " uspjesno  je" + response.body().getId());
+                        if (response.code() == 200) {
+                            Log.d(TAG, " vratio se posle update goals back" + response.code());
+                        }
                     }
                 }
-            }
-            @Override
-            public void onFailure(Call<GoalResponse> call, Throwable t) {
-                Log.d(TAG," neuspesno update goal");
 
-            }
-        });
+                @Override
+                public void onFailure(Call<GoalResponse> call, Throwable t) {
+                    Log.d(TAG, " neuspesno update goal");
 
+                }
+            });
 
+        }
     }
     public void onStartClick(View view) {
 
