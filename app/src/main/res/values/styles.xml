@@ -20,5 +20,10 @@
         <item name="colorAccent">@color/darkBlue</item>
     </style>
 
+    <style name="AppTheme.WhiteAccent">
+        <item name="colorAccent">@color/green
+        </item>
+    </style>
+
 
 </resources>

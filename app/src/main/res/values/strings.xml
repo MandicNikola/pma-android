@@ -35,7 +35,7 @@
     <string name="mapbox_access_token">pk.eyJ1IjoibWFuZGF1bnMiLCJhIjoiY2thdGpoem9wMHU3OTJ1b2N2djU2bWo2eCJ9.WiHV5bEzANKqwbfVwbJnNQ</string>
     <string name="create">Create</string>
     <string name="chooseDeadline">Choose a deadline</string>
-
+    <string name="true_tick">\u2713</string>
     <string-array name="gender_array">
         <item>Male</item>
         <item>Female</item>

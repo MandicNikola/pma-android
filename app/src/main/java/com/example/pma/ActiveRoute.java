@@ -355,6 +355,14 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 String current_time_string = simpleDateFormat.format(current_time);
                 long idPoint = dbManagerPoint.insert((float)location.getLongitude(),(float)location.getLatitude(),id,current_time_string);
             }
+            Date endDateRoute= null;
+            try {
+                endDateRoute = new SimpleDateFormat("yyyy-MM-dd").parse(strDate1);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            updateGoal(endDateRoute);
+
             startTracking = false;
         }
         mapView.onDestroy();
@@ -401,8 +409,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         return locationRequest;
     }
 
-    // handle when route is finished
-    // TODO: put route in DB
     public void onFinishClick(View view) throws ParseException {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
         // TODO: Handle case when there's not locations
@@ -453,7 +459,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 SimpleDateFormat simpleDateFormatGoal = new SimpleDateFormat("yyyy-MM-dd");
                 String goalDate = simpleDateFormatGoal.format(goal.getDate());
 
-                // TODO: update boolean for showing notification, also goals that are already completed should not be considered
                 if(goal.getGoalKey().equals("Distance")) {
 
                         double currentValueDistance = goal.getCurrentValue() + this.distance;

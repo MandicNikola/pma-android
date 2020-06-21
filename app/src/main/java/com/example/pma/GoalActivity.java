@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.pma.adapter.GoalAdapter;
@@ -50,7 +51,6 @@ public class GoalActivity extends AppCompatActivity {
                 .baseUrl("https://pma-app-19.herokuapp.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
 
         dbManager = new DatabaseManagerGoal(this);
@@ -78,7 +78,6 @@ public class GoalActivity extends AppCompatActivity {
         recyclerView.setAdapter(goalAdapter);
     }
 
-    // TODO: Check for solution
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
