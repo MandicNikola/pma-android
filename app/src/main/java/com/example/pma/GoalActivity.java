@@ -35,7 +35,6 @@ public class GoalActivity extends AppCompatActivity {
     private GoalAdapter goalAdapter;
     private SharedPreferences preferences;
     Retrofit retrofit;
-    private AuthPlaceholder service;
     private DatabaseManagerGoal dbManager;
     public static final int CREATE_GOAL = 1;
     private static final String TAG = "GoalActivity";

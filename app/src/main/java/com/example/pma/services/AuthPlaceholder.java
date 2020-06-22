@@ -7,6 +7,7 @@ import com.example.pma.model.LoginResponse;
 import com.example.pma.model.Profile;
 import com.example.pma.model.User;
 import com.example.pma.model.UserResponse;
+import com.example.pma.model.UserSettings;
 
 import java.util.HashMap;
 
@@ -29,5 +30,9 @@ public interface AuthPlaceholder {
     Call<Profile> getProfile(@Header("Authorization") String token);
     @PATCH("users/updateProfile")
     Call<HashMap<String, String>> updateProfile(@Body Profile profile, @Header("Authorization") String token);
+    @PATCH("users/updateReminder")
+    Call<HashMap<String, String>> updateReminder(@Body UserSettings settings, @Header("Authorization") String token);
+     @GET("users/profile")
+    Call<UserSettings> getWaterReminder(@Header("Authorization") String token);
 
 }
