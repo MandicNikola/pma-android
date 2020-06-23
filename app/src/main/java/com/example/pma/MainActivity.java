@@ -32,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private AuthPlaceholder service;
 
     private static final int NOTIFICATION_ID = 1;
+    public static String SYNC_DATA = "SYNC_DATA";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
