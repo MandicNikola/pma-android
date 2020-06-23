@@ -5,12 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.pma.model.LoginRequest;
 import com.example.pma.model.LoginResponse;
@@ -18,6 +22,7 @@ import com.example.pma.model.Profile;
 import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
 
+import hossamscott.com.github.backgroundservice.RunService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,13 +52,19 @@ public class MainActivity extends AppCompatActivity {
 
         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
 
+        RunService repeat = new RunService(this);
+        repeat.call(120, true);
+        IntentFilter intentFilter = new IntentFilter("alaram_received");
+        registerReceiver(alarm_receiver, intentFilter);
+
+
         Intent notifyIntent = new Intent(this, WaterReceiver.class);
 
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
                 (this, NOTIFICATION_ID, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // TODO: Need to implement initialization using shared preferences for water reminder
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         long repeatInterval = AlarmManager.INTERVAL_FIFTEEN_MINUTES;
         long triggerTime = SystemClock.elapsedRealtime()
@@ -122,4 +133,19 @@ public class MainActivity extends AppCompatActivity {
         }, 2000);
 
     }
+    BroadcastReceiver alarm_receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // your logic here
+            Log.i("alarm_received", "success");
+
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(alarm_receiver);
+    }
+
 }
