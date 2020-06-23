@@ -16,11 +16,24 @@ import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.pma.database.DatabaseManagerPoint;
+import com.example.pma.database.DatabaseManagerRoute;
+import com.example.pma.model.GoalResponse;
 import com.example.pma.model.LoginRequest;
 import com.example.pma.model.LoginResponse;
+import com.example.pma.model.Point;
 import com.example.pma.model.Profile;
+import com.example.pma.model.Route;
+import com.example.pma.model.RouteRequest;
+import com.example.pma.model.RouteResponse;
 import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
+import com.example.pma.services.GoalPlaceholder;
+import com.example.pma.services.RoutePlaceholder;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import hossamscott.com.github.backgroundservice.RunService;
 import retrofit2.Call;
@@ -35,9 +48,12 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences preferences;
     Retrofit retrofit;
     private AuthPlaceholder service;
-
+    private RoutePlaceholder routeService;
     private static final int NOTIFICATION_ID = 1;
-    public static String SYNC_DATA = "SYNC_DATA";
+    private DatabaseManagerRoute dbManager;
+    private DatabaseManagerPoint managerPoint;
+    private ArrayList<Route> routes;
+    private List<Point> points = new ArrayList<com.example.pma.model.Point>();
 
 
     @Override
@@ -51,6 +67,9 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
+        dbManager = new DatabaseManagerRoute(this);
+        managerPoint = new DatabaseManagerPoint(this);
+        routeService = retrofit.create(RoutePlaceholder.class);
 
         RunService repeat = new RunService(this);
         repeat.call(120, true);
@@ -137,7 +156,51 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             // your logic here
-            Log.i("alarm_received", "success");
+
+            dbManager.open();
+            managerPoint.open();
+            routes = dbManager.getRoutes();
+            //sinhr. id je -1
+             for(Route route:routes){
+                 if(route.getSynchronized_id() == -1){
+                     if(preferences.contains("token") ) {
+                         String token = preferences.getString("token",null);
+
+                         points = managerPoint.getRoutePoints(route.getId());
+                    HashMap<String, List<Double>> pointsMap = new HashMap<String, List<Double>>();
+                          for(Point point:points){
+                                List<Double> values = new ArrayList<>();
+                                values.add(point.getLatitude());
+                                values.add(point.getLongitude());
+                                pointsMap.put(point.getDateTime(),values);
+                          }
+
+                    RouteRequest routeRequest = new RouteRequest(route.getStart_time(),route.getEnd_time(),pointsMap,route.getDistance());
+                     Call<RouteResponse> call = routeService.saveRoute(routeRequest,"Bearer "+token);
+                     call.enqueue(new Callback<RouteResponse>() {
+                         @Override
+                         public void onResponse(Call<RouteResponse> call, Response<RouteResponse> response) {
+                             Log.d(TAG," kod je"+response.code());
+
+                             if (response.isSuccessful()) {
+                                 Log.d(TAG," uspjesno  je"+response.body().getId());
+                                 if(response.code() == 200){
+                                     Log.d(TAG," vratio se posle dodavanja "+response.code());
+                                 }
+                             }
+                         }
+                         @Override
+                         public void onFailure(Call<RouteResponse> call, Throwable t) {
+                             Log.d(TAG," neuspesno");
+
+                         }
+                     });
+
+
+                    }
+                 }
+             }
+
 
         }
     };

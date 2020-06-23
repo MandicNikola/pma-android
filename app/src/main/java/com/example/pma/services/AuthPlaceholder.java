@@ -32,7 +32,5 @@ public interface AuthPlaceholder {
     Call<HashMap<String, String>> updateProfile(@Body Profile profile, @Header("Authorization") String token);
     @PATCH("users/updateReminder")
     Call<HashMap<String, String>> updateReminder(@Body UserSettings settings, @Header("Authorization") String token);
-     @GET("users/profile")
-    Call<UserSettings> getWaterReminder(@Header("Authorization") String token);
 
 }
