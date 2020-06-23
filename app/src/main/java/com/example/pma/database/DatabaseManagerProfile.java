@@ -33,12 +33,13 @@ public class DatabaseManagerProfile {
     public void close(){
         dbHelper.close();
     }
-    public void insert(double height, double weight, int user_id){
+    public void insert(double height, double weight, int user_id,int water_reminder){
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.HEIGHT, height);
         contentValues.put(DatabaseHelper.WEIGHT, weight);
         contentValues.put(DatabaseHelper.USER_ID, user_id);
+        contentValues.put(DatabaseHelper.WATER_REMINDER,water_reminder);
         database.insert(DatabaseHelper.TABLE_PROFILE, null, contentValues);
     }
     public Cursor fetch(){
@@ -68,6 +69,7 @@ public class DatabaseManagerProfile {
         }
         return  id;
 }
+
     public int update( double height, double weight, int user_id){
         int idRow = getProfileId(user_id);
         ContentValues contentValues = new ContentValues();
@@ -77,7 +79,36 @@ public class DatabaseManagerProfile {
         int i = database.update(DatabaseHelper.TABLE_PROFILE, contentValues,DatabaseHelper._ID + " = "+idRow,null);
         return i ;
     }
+    public int updateReminder(int reminder, int user_id){
+        int idRow = getProfileId(user_id);
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.USER_ID, user_id);
+        contentValues.put(DatabaseHelper.WATER_REMINDER,reminder);
+        int i = database.update(DatabaseHelper.TABLE_PROFILE, contentValues,DatabaseHelper._ID + " = "+idRow,null);
+        Log.d(TAG, "reminder u database "+reminder+ " user id je "+user_id );
 
+        return i ;
+    }
+    public int getReminder(int user_id){
+        Cursor cursor = database.rawQuery("select "+ DatabaseHelper.WATER_REMINDER +" from "+DatabaseHelper.TABLE_PROFILE + " where " + DatabaseHelper.USER_ID + " = " +user_id+";" , null);
+        int reminder = 0;
+        try {
+            if (cursor.moveToFirst()) {
+                do {
+                    reminder = cursor.getInt(cursor.getColumnIndex(dbHelper.WATER_REMINDER));
+                    Log.d(TAG, "reminder je "+reminder);
+
+                } while(cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.d(TAG, "Error while trying to get water reminder from database");
+        } finally {
+            if (cursor != null && !cursor.isClosed()) {
+                cursor.close();
+            }
+        }
+        return  reminder;
+    }
     public  void delete(long id){
         database.delete(DatabaseHelper.TABLE_PROFILE,DatabaseHelper._ID+" = "+ id,null);
     }

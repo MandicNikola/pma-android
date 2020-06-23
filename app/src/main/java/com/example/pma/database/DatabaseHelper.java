@@ -6,13 +6,14 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    static final String DB_NAME = "ANDROID_DATABASE_PMA13.DB";
+    static final String DB_NAME = "ANDROID_DATABASE_PMA14.DB";
     static final int DB_VERSION = 1;
     public static final String TABLE_GOALS = "goals";
     public static final String TABLE_USERS = "users";
     public static final String TABLE_ROUTES = "routes";
     public static final String TABLE_POINTS = "points";
     public static final String TABLE_PROFILE = "profiles";
+    public static final String TABLE_SETTINGS = "settings";
 
     public static final String FIRSTNAME = "firstname";
     public static final String LASTNAME = "lastname";
@@ -55,6 +56,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     KEY_POST_TEXT + " TEXT" +
                 ")";
 */
+
     private static final String CREATE_GOALS = " create table " + TABLE_GOALS +
         "("+
             _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -83,7 +85,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 _ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
                 HEIGHT +" REAL, "+
                 WEIGHT + " REAL," +
-                USER_ID + " INTEGER"+
+                USER_ID + " INTEGER, "+
+               WATER_REMINDER + " TEXT " +
+
             ");";
 
     private static final String CREATE_ROUTES = " create table " + TABLE_ROUTES+
@@ -116,6 +120,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_ROUTES);
         db.execSQL(CREATE_PROFILE);
         db.execSQL(CREATE_USERS);
+
     }
 
     @Override

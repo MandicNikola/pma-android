@@ -68,7 +68,7 @@ public class RegisterActivity extends AppCompatActivity {
                         MessageDialogue dialog = new MessageDialogue("You have successfully registered", "Notification");
                         dialog.show(getSupportFragmentManager(), "example dialog");
                         int id = response.body().getId();
-                        dbManagerProfile.insert(170,60, id);
+                        dbManagerProfile.insert(170,60, id,0);
                         new Handler().postDelayed(new Runnable() {
 
                             @Override
