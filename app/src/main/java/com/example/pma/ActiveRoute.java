@@ -27,6 +27,8 @@ import com.example.pma.database.DatabaseManagerPoint;
 import com.example.pma.database.DatabaseManagerRoute;
 import com.example.pma.model.Goal;
 import com.example.pma.model.GoalResponse;
+import com.example.pma.model.Profile;
+import com.example.pma.services.AuthPlaceholder;
 import com.example.pma.services.GoalPlaceholder;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -71,6 +73,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     private MapView mapView;
     private MapboxMap mapboxMap;
+    private AuthPlaceholder service;
 
     private static final String DOT_SOURCE_ID = "dot-source-id";
 
@@ -94,6 +97,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     // TODO: Later when get user settings need to provide those values from DB
     private double height = 192;
     private double weight = 105;
+    private String tokenUser = "";
 
     private boolean startTracking = false;
     //for  SQlite database
@@ -180,6 +184,24 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 return;
             }
         }
+        Call<Profile> call = service.getProfile("Bearer "+ tokenUser);
+        call.enqueue(new Callback<Profile>() {
+            @Override
+            public void onResponse(Call<Profile> call, Response<Profile> response) {
+                Log.d(TAG,"Code is "+response.code());
+                if (response.isSuccessful()) {
+                    if(response.code() == 200){
+                        height= response.body().getHeight();
+                        weight = response.body().getWeight();
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<Profile> call, Throwable t) {
+                Log.d(TAG,"Unsuccessfull");
+            }
+        });
+
         // TODO: Need to get userSettings because need for user weight and height
 
         // Initialization of notification channel
@@ -503,6 +525,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         String token = "";
 
         if(preferences.contains("token") ) {
+            tokenUser = preferences.getString("token", null);
             token = "Bearer "+ preferences.getString("token", null);
 
             Call<GoalResponse> callGoal = goalService.updateGoal(goal, token);

@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.example.pma.model.LoginRequest;
 import com.example.pma.model.LoginResponse;
+import com.example.pma.model.Profile;
 import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
 
@@ -76,9 +77,33 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                             if(response.code() == 403){
+
                                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                             }
                             if(response.code() == 200){
+
+                                Call<Profile> call2 = service.getProfile("Bearer "+token);
+                                call2.enqueue(new Callback<Profile>() {
+                                    @Override
+                                    public void onResponse(Call<Profile> call, Response<Profile> response) {
+                                        Log.d(TAG,"Code is "+response.code());
+                                        if (response.isSuccessful()) {
+                                            if(response.code() == 200){
+                                                SharedPreferences.Editor editor = preferences.edit();
+                                                if(response.body().isWaterReminder()){
+                                                    editor.putString("reminder", "true");
+                                                }else{
+                                                    editor.putString("reminder", "false");
+                                                }
+                                                editor.commit();
+                                            }
+                                        }
+                                    }
+                                    @Override
+                                    public void onFailure(Call<Profile> call, Throwable t) {
+                                        Log.d(TAG,"Unsuccessfull");
+                                    }
+                                });
                                 startActivity(new Intent(MainActivity.this, RouteActivity.class));
                             }
                         }
