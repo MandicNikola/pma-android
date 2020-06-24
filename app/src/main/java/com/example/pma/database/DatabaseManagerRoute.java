@@ -64,6 +64,14 @@ public class DatabaseManagerRoute {
         int i = database.update(DatabaseHelper.TABLE_ROUTES,contentValues,DatabaseHelper._ID + " = "+id,null);
         return i ;
     }
+
+    public int updateSynchronized(long id, Long synchronized_id){
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.SYNCHRONIZED_ID,synchronized_id);
+
+        int i = database.update(DatabaseHelper.TABLE_ROUTES,contentValues,DatabaseHelper._ID + " = "+id,null);
+        return i ;
+    }
     public void delete(long id){
         database.delete(DatabaseHelper.TABLE_ROUTES,DatabaseHelper._ID+" = "+ id,null);
     }

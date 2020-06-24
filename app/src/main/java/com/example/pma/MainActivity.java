@@ -186,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
                                  Log.d(TAG," uspjesno  je"+response.body().getId());
                                  if(response.code() == 200){
                                      Log.d(TAG," vratio se posle dodavanja "+response.code());
+                                    //dbManager.updateSynchronized(route.getId(), response.body().getId());
                                  }
                              }
                          }
