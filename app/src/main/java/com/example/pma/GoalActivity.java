@@ -91,4 +91,14 @@ public class GoalActivity extends AppCompatActivity {
         }
     }
 
-}
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        goals = savedInstanceState.getParcelableArrayList("goal");
+
+    }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putParcelableArrayList("goal",goals);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+    }

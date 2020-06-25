@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.pma.database.DatabaseManagerGoal;
@@ -24,6 +25,8 @@ import com.example.pma.model.GoalResponse;
 import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
 import com.example.pma.services.GoalPlaceholder;
+
+import org.w3c.dom.Text;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -37,6 +40,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class CreateGoalActivity extends AppCompatActivity {
     private Spinner spinner;
+    private TextView dateTextView;
     String[] spinner_array = { "Calories", "Distance"};
     private String date;
     private String key;
@@ -46,6 +50,7 @@ public class CreateGoalActivity extends AppCompatActivity {
     Retrofit retrofit;
     private AuthPlaceholder service;
     private GoalPlaceholder goalService;
+
 
     private int id;
     public static final String GOAL_RESULT = "GOAL_RESULT";
@@ -66,6 +71,7 @@ public class CreateGoalActivity extends AppCompatActivity {
         ArrayAdapter adapter= new ArrayAdapter(this,android.R.layout.simple_spinner_item, spinner_array);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+        dateTextView = (TextView) findViewById(R.id.goal_date);
         dbManager = new DatabaseManagerGoal(this);
         dbManager.open();
 
@@ -165,6 +171,7 @@ public class CreateGoalActivity extends AppCompatActivity {
         String year_string = Integer.toString(year);
         Date goalDate = new Date();
         date = year_string+"-"+month_string+"-"+day_string;
+        dateTextView.setText(date);
 
     }
 }

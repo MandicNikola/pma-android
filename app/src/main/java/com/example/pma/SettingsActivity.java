@@ -43,6 +43,9 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            userId = savedInstanceState.getInt("userId");
+        }
         setContentView(R.layout.activity_settings);
 
         retrofit = new Retrofit.Builder()
@@ -58,7 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
         service = retrofit.create(AuthPlaceholder.class);
         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
 
-        if(preferences.contains("token") ) {
+        if (preferences.contains("token")) {
             token = preferences.getString("token", null);
 
             Call<UserResponse> callLoggedUser = service.getLoggedUser("Bearer " + token);
@@ -69,7 +72,7 @@ public class SettingsActivity extends AppCompatActivity {
                     if (response.code() == 200) {
                         userId = response.body().getId();
                         reminderFlag = dbManager.getReminder(userId);
-                        if(reminderFlag == 1){
+                        if (reminderFlag == 1) {
                             switchReminder.setChecked(true);
                         }
                     }
@@ -80,7 +83,6 @@ public class SettingsActivity extends AppCompatActivity {
 
                 }
             });
-
         }
 
 
@@ -109,29 +111,29 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
     }
-    public void updateSettingsBack(boolean reminder){
+
+    public void updateSettingsBack(boolean reminder) {
         service = retrofit.create(AuthPlaceholder.class);
 
-        if(preferences.contains("token") ) {
+        if (preferences.contains("token")) {
             token = preferences.getString("token", null);
             UserSettings settings = new UserSettings(reminder);
-
-            Call<HashMap<String, String>> updateSettings = service.updateReminder(settings,"Bearer "+token);
+            Call<HashMap<String, String>> updateSettings = service.updateReminder(settings, "Bearer " + token);
+            dbManager = new DatabaseManagerProfile(this);
+            dbManager.open();
             updateSettings.enqueue(new Callback<HashMap<String, String>>() {
                 @Override
                 public void onResponse(Call<HashMap<String, String>> call, Response<HashMap<String, String>> response) {
-                    if(response.code() == 200){
-                        Log.d(TAG,"ola reminder "+ reminder);
 
+                    if (response.code() == 200) {
                         ProfileDB profileDB = dbManager.getProfileByUserId(userId);
-                        if(reminder) {dbManager.updateReminder(1,userId);
 
-                            Log.d(TAG,"update reminder 1 ");}else{
-                            dbManager.updateReminder(0,userId);
-
-                            Log.d(TAG,"update reminder 0 ");
+                        if (reminder) {
+                            dbManager.updateReminder(1, userId);
+                         } else {
+                            dbManager.updateReminder(0, userId);
                         }
-                   }else{
+                    } else {
                         MessageDialogue dialog = new MessageDialogue("There was a problem with updating water reminder, please try again", "Notification");
                         dialog.show(getSupportFragmentManager(), "Reminder");
                     }
@@ -143,8 +145,28 @@ public class SettingsActivity extends AppCompatActivity {
                     dialog.show(getSupportFragmentManager(), "Reminder");
                 }
             });
+
         }
 
-    }
-}
 
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if(savedInstanceState.getBoolean("reminder")){
+           switchReminder.setChecked(true);
+       }
+        userId = savedInstanceState.getInt("userId");
+        dbManager = new DatabaseManagerProfile(this);
+        dbManager.open();
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putBoolean("reminder",reminder);
+        savedInstanceState.putInt("userId",userId);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+}
