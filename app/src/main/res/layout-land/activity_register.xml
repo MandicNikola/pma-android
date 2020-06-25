@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:background="#FFFFFF"
+        android:layout_height="match_parent"
+        android:padding="20dp"
+        tools:context=".RegisterActivity">
+
+        <ImageView
+            android:id="@+id/logoImg"
+            android:layout_width="match_parent"
+            android:layout_height="128dp"
+            android:contentDescription="@string/app_image_content_desc"
+            app:srcCompat="@drawable/gwlofo2" />
+
+        <EditText
+            android:id="@+id/firstName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:ems="10"
+            android:hint="firstname"
+            android:importantForAutofill="no"
+            android:inputType="textPersonName"
+            android:textColorHint="@color/lightBlue" />
+
+        <EditText
+            android:id="@+id/lastName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:ems="10"
+            android:hint="lastname"
+            android:importantForAutofill="no"
+            android:inputType="textPersonName"
+            android:textColorHint="@color/lightBlue" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:ems="10"
+            android:hint="email"
+            android:importantForAutofill="no"
+            android:inputType="textEmailAddress"
+            android:textColorHint="@color/lightBlue" />
+
+        <EditText
+            android:id="@+id/username"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:ems="10"
+            android:hint="username"
+            android:importantForAutofill="no"
+            android:inputType="textPersonName"
+            android:textColorHint="@color/lightBlue" />
+
+
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:ems="10"
+            android:hint="@string/password_placeholder"
+            android:inputType="textPassword"
+            android:textColorHint="@color/lightBlue" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp"
+            android:onClick="checkData"
+            android:background="@drawable/custom_btn"
+            android:text="Register" />
+
+    </LinearLayout>
+</ScrollView>
