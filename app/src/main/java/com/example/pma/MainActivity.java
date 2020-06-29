@@ -31,7 +31,10 @@ import com.example.pma.services.AuthPlaceholder;
 import com.example.pma.services.GoalPlaceholder;
 import com.example.pma.services.RoutePlaceholder;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -155,38 +158,54 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceiver alarm_receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // your logic here
 
             dbManager.open();
             managerPoint.open();
             routes = dbManager.getRoutes();
-            //sinhr. id je -1
              for(Route route:routes){
                  if(route.getSynchronized_id() == -1){
                      if(preferences.contains("token") ) {
                          String token = preferences.getString("token",null);
 
                          points = managerPoint.getRoutePoints(route.getId());
-                    HashMap<String, List<Double>> pointsMap = new HashMap<String, List<Double>>();
+                         HashMap<String, List<Double>> pointsMap = new HashMap<String, List<Double>>();
                           for(Point point:points){
                                 List<Double> values = new ArrayList<>();
-                                values.add(point.getLatitude());
-                                values.add(point.getLongitude());
-                                pointsMap.put(point.getDateTime(),values);
+                              String formattedDate = "";
+                              try {
+                                  Date date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(point.getDateTime());
+                                   formattedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(date);
+
+                              } catch (ParseException e) {
+                                  e.printStackTrace();
+                              }
+
+                              values.add(point.getLatitude());
+                              values.add(point.getLongitude());
+                              pointsMap.put(formattedDate,values);
+
+                          }
+                          String formattedDateEndRoute = "";
+                          String formattedDateStartRoute="";
+                          try{
+                         Date date = new SimpleDateFormat("yyyy-MM-dd").parse(route.getEnd_time());
+                         formattedDateEndRoute = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(date);
+                         date = new SimpleDateFormat("yyyy-MM-dd").parse(route.getStart_time());
+                         formattedDateStartRoute =  new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(date);
+
+                          }catch (ParseException e) {
+                            e.printStackTrace();
                           }
 
-                    RouteRequest routeRequest = new RouteRequest(route.getStart_time(),route.getEnd_time(),pointsMap,route.getDistance());
-                     Call<RouteResponse> call = routeService.saveRoute(routeRequest,"Bearer "+token);
-                     call.enqueue(new Callback<RouteResponse>() {
+                         RouteRequest routeRequest = new RouteRequest(formattedDateStartRoute,formattedDateEndRoute,pointsMap,route.getDistance());
+                         Call<RouteResponse> call = routeService.saveRoute(routeRequest,"Bearer "+token);
+                         call.enqueue(new Callback<RouteResponse>() {
                          @Override
                          public void onResponse(Call<RouteResponse> call, Response<RouteResponse> response) {
-                             Log.d(TAG," kod je"+response.code());
 
                              if (response.isSuccessful()) {
-                                 Log.d(TAG," uspjesno  je"+response.body().getId());
                                  if(response.code() == 200){
-                                     Log.d(TAG," vratio se posle dodavanja "+response.code());
-                                    //dbManager.updateSynchronized(route.getId(), response.body().getId());
+                                     dbManager.updateSynchronized(route.getId(), response.body().getId());
                                  }
                              }
                          }

@@ -51,7 +51,7 @@ public class DatabaseManagerRoute {
         return  cursor;
 
     }
-    public int update(long id,double calories,double distance,String unit,Long synchronized_id,String start_date,String end_date){
+   public int update(long id,double calories,double distance,String unit,Long synchronized_id,String start_date,String end_date){
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.CALORIES,calories);
         contentValues.put(DatabaseHelper.DISTANCE,distance);
@@ -96,7 +96,7 @@ public class DatabaseManagerRoute {
 
                      route.setEnd_time(cursor.getString(cursor.getColumnIndex(dbHelper.END_DATE)));
                     route.setStart_time(cursor.getString(cursor.getColumnIndex(dbHelper.START_DATE)));
-                     route.setSynchronized_id(Long.parseLong(cursor.getString(cursor.getColumnIndex(dbHelper.SYNCHRONIZED_ID))));
+                     route.setSynchronized_id(cursor.getLong(cursor.getColumnIndex(dbHelper.SYNCHRONIZED_ID)));
 
                    // String dateStringEnd = cursor.getString(cursor.getColumnIndex(dbHelper.END_DATE));
                     //String dateStringStart = cursor.getString(cursor.getColumnIndex(dbHelper.START_DATE));
@@ -134,7 +134,7 @@ public class DatabaseManagerRoute {
 
                     route.setEnd_time(cursor.getString(cursor.getColumnIndex(dbHelper.END_DATE)));
                     route.setStart_time(cursor.getString(cursor.getColumnIndex(dbHelper.START_DATE)));
-                    route.setSynchronized_id(Long.parseLong(cursor.getString(cursor.getColumnIndex(dbHelper.SYNCHRONIZED_ID))));
+                    route.setSynchronized_id(cursor.getLong(cursor.getColumnIndex(dbHelper.SYNCHRONIZED_ID)));
 
                     // String dateStringEnd = cursor.getString(cursor.getColumnIndex(dbHelper.END_DATE));
                     //String dateStringStart = cursor.getString(cursor.getColumnIndex(dbHelper.START_DATE));
