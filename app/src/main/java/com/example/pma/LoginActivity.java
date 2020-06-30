@@ -13,10 +13,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.pma.database.DatabaseManagerProfile;
+import com.example.pma.database.DatabaseManagerUser;
 import com.example.pma.dialogues.MessageDialogue;
 
 import com.example.pma.model.LoginRequest;
 import com.example.pma.model.LoginResponse;
+import com.example.pma.model.Profile;
+import com.example.pma.model.UserResponse;
 import com.example.pma.services.AuthPlaceholder;
 
 import retrofit2.Call;
@@ -32,11 +36,18 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences preferences;
     private String username = "";
     private String password = "";
+    private DatabaseManagerProfile dbManagerProfile;
+    private DatabaseManagerUser dbManagerUser;
 
+    private Integer userId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        dbManagerProfile = new DatabaseManagerProfile(this);
+        dbManagerProfile.open();
+        dbManagerUser = new DatabaseManagerUser(this);
+        dbManagerUser.open();
         retrofit = new Retrofit.Builder()
                 .baseUrl("https://pma-app-19.herokuapp.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -71,20 +82,32 @@ public class LoginActivity extends AppCompatActivity {
                         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
                         SharedPreferences.Editor editor = preferences.edit();
                         String savedUsername = "";
+                        Log.d("Login","Prvi username "+ username);
 
-                        if(preferences.contains("username")){
-                            savedUsername = preferences.getString("username",null);
+                        if(preferences.contains("ime")){
+                            Log.d("Login","Sadrzi username "+ savedUsername);
+
+                            savedUsername = preferences.getString("ime",null);
                             if(!savedUsername.equals(username)){
-                                Log.d("Login","u update");
-                                updateTable(response.body().getAccessToken());
-                                fillTable(response.body().getAccessToken());
+                                Log.d("Login","Razliciti username ");
+
+                                Log.d("Login","FIRST ****** "+username);
+
+
+                                Log.d("Login","SECOND SAVED ****** "+ savedUsername);
+                                dbManagerUser.deleteTables();
+                                fillTables(response.body().getAccessToken());
                             }
                         }
 
 
                         editor.putString("token", response.body().getAccessToken());
-                        editor.putString("username", username);
+                        editor.putString("ime", username);
                         editor.commit();
+                        if(preferences.contains("ime")){
+                            Log.d("Login","SADRZEE ****** "+preferences.getString("ime",null));
+
+                        }
 
                         MessageDialogue dialog = new MessageDialogue("You have successfully logged in", "Notification");
                         dialog.show(getSupportFragmentManager(), "logging dialog");
@@ -120,8 +143,37 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
   }
-    void updateTable(String token){}
-    void fillTable(String token){}
+    void fillTables(String token){
+        Call<UserResponse> callLoggedUser = service.getLoggedUser("Bearer "+token);
+        callLoggedUser.enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                if(response.code() == 200) {
+                    userId = response.body().getId();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) {
+
+            }
+        });
+        Call<Profile> call = service.getProfile("Bearer "+token);
+        call.enqueue(new Callback<Profile>() {
+            @Override
+            public void onResponse(Call<Profile> call, Response<Profile> response) {
+                if (response.isSuccessful()) {
+                    if(response.code() == 200){
+                        dbManagerProfile.insert(response.body().getHeight(),response.body().getWeight(), userId,0);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call<Profile> call, Throwable t) {
+                Log.d(TAG,"Unsuccessfull");
+            }
+        });
+    }
 
     public void navigateRegister(View view) {
         Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
