@@ -26,6 +26,7 @@ public class DatabaseManagerUser {
         database.execSQL("DROP TABLE IF EXISTS " + dbHelper.TABLE_PROFILE);
         database.execSQL("DROP TABLE IF EXISTS " + dbHelper.TABLE_GOALS);
         database.execSQL("DROP TABLE IF EXISTS " + dbHelper.TABLE_USERS);
+        dbHelper.onCreate(database);
     }
     public void close(){
         dbHelper.close();

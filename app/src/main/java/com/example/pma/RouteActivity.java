@@ -166,7 +166,7 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
         }
         if(id == R.id.nav_log_out){
             SharedPreferences.Editor editor = preferences.edit();
-            editor.clear();
+            editor.remove("token");
             editor.commit();
             Intent intent = new Intent(RouteActivity.this, MainActivity.class);
             startActivity(intent);

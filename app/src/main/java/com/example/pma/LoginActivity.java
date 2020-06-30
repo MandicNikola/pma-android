@@ -35,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     private AuthPlaceholder service;
     private SharedPreferences preferences;
     private String username = "";
+    private String savedUsername = "";
     private String password = "";
     private DatabaseManagerProfile dbManagerProfile;
     private DatabaseManagerUser dbManagerUser;
@@ -52,6 +53,10 @@ public class LoginActivity extends AppCompatActivity {
                 .baseUrl("https://pma-app-19.herokuapp.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+        if(savedInstanceState != null){
+            this.savedUsername = savedInstanceState.getString("savedUsername");
+
+        }
 
     }
     public void checkData(View view){
@@ -80,14 +85,15 @@ public class LoginActivity extends AppCompatActivity {
                 if(response.isSuccessful()){
                     if(response.code() == 200){
                         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = preferences.edit();
                         String savedUsername = "";
                         Log.d("Login","Prvi username "+ username);
+                        Log.d("Login","Sacuvani usernam "+ preferences.getString("username"," NEMAAA "));
 
-                        if(preferences.contains("ime")){
+                        if(preferences.contains("username")){
+
+                            savedUsername = preferences.getString("username",null);
+
                             Log.d("Login","Sadrzi username "+ savedUsername);
-
-                            savedUsername = preferences.getString("ime",null);
                             if(!savedUsername.equals(username)){
                                 Log.d("Login","Razliciti username ");
 
@@ -100,14 +106,12 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         }
 
+                        SharedPreferences.Editor editor = preferences.edit();
 
                         editor.putString("token", response.body().getAccessToken());
-                        editor.putString("ime", username);
+                        editor.putString("username", username);
                         editor.commit();
-                        if(preferences.contains("ime")){
-                            Log.d("Login","SADRZEE ****** "+preferences.getString("ime",null));
 
-                        }
 
                         MessageDialogue dialog = new MessageDialogue("You have successfully logged in", "Notification");
                         dialog.show(getSupportFragmentManager(), "logging dialog");
@@ -178,5 +182,15 @@ public class LoginActivity extends AppCompatActivity {
     public void navigateRegister(View view) {
         Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+
+    }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+
+        super.onSaveInstanceState(savedInstanceState);
     }
 }
