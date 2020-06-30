@@ -592,4 +592,5 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         return notifyBuilder;
     }
 
+
 }
