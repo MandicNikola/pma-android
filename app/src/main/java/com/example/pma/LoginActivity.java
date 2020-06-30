@@ -30,6 +30,8 @@ public class LoginActivity extends AppCompatActivity {
     Retrofit retrofit;
     private AuthPlaceholder service;
     private SharedPreferences preferences;
+    private String username = "";
+    private String password = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +44,8 @@ public class LoginActivity extends AppCompatActivity {
 
     }
     public void checkData(View view){
-        String username = ((EditText)findViewById(R.id.username)).getText().toString();
-        String password = ((EditText)findViewById(R.id.password)).getText().toString();
+        username = ((EditText)findViewById(R.id.username)).getText().toString();
+        password = ((EditText)findViewById(R.id.password)).getText().toString();
         boolean correct = true;
             if(TextUtils.isEmpty(username)){
                 correct = false;
@@ -68,8 +70,20 @@ public class LoginActivity extends AppCompatActivity {
                     if(response.code() == 200){
                         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
                         SharedPreferences.Editor editor = preferences.edit();
+                        String savedUsername = "";
+
+                        if(preferences.contains("username")){
+                            savedUsername = preferences.getString("username",null);
+                            if(!savedUsername.equals(username)){
+                                Log.d("Login","u update");
+                                updateTable(response.body().getAccessToken());
+                                fillTable(response.body().getAccessToken());
+                            }
+                        }
+
 
                         editor.putString("token", response.body().getAccessToken());
+                        editor.putString("username", username);
                         editor.commit();
 
                         MessageDialogue dialog = new MessageDialogue("You have successfully logged in", "Notification");
@@ -106,6 +120,8 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
   }
+    void updateTable(String token){}
+    void fillTable(String token){}
 
     public void navigateRegister(View view) {
         Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);

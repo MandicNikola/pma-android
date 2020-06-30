@@ -20,6 +20,13 @@ public class DatabaseManagerUser {
         database = dbHelper.getWritableDatabase();
         return  this;
     }
+    public void deleteTables(){
+        database.execSQL("DROP TABLE IF EXISTS " + dbHelper.TABLE_POINTS);
+        database.execSQL("DROP TABLE IF EXISTS " + dbHelper.TABLE_ROUTES);
+        database.execSQL("DROP TABLE IF EXISTS " + dbHelper.TABLE_PROFILE);
+        database.execSQL("DROP TABLE IF EXISTS " + dbHelper.TABLE_GOALS);
+        database.execSQL("DROP TABLE IF EXISTS " + dbHelper.TABLE_USERS);
+    }
     public void close(){
         dbHelper.close();
     }
