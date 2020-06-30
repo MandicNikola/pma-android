@@ -18,17 +18,22 @@ public class WaterReceiver extends BroadcastReceiver {
     private static final String PRIMARY_CHANNEL_ID =
             "primary_notification_channel";
     private SharedPreferences preferences;
-    private static final String TAG = "WaterReciever";
+    private static final String TAG = "WaterReceiver";
 
 
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.d(TAG, "on Receive ");
+
         mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         preferences = context.getSharedPreferences("user_detail", Context.MODE_PRIVATE);
         if(preferences.getBoolean("waterFlag",false)) {
             Log.d(TAG, "water on");
             deliverNotification(context);
+        }else{
+            Log.d(TAG, "water off");
+
         }
     }
 

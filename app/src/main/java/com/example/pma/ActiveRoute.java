@@ -144,7 +144,20 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         distanceValueView.setText("0 m");
         caloriesValueView = (TextView)findViewById(R.id.calories_value);
         caloriesValueView.setText("0 cal");
+        if(savedInstanceState != null){
+            if(savedInstanceState.containsKey("calories")){
+                this.calories = savedInstanceState.getDouble("calories");
+                distanceValueView.setText(Math.round(this.distance*100)/100.0 + " m");
+                caloriesValueView.setText(Math.round(this.calories*100)/100.0 + " cal");
+            }
+            if(savedInstanceState.containsKey("distance")){
+                this.distance = savedInstanceState.getFloat("distance");
+                distanceValueView.setText(Math.round(this.distance*100)/100.0 + " m");
+            }
 
+
+
+        }
         dbManager = new DatabaseManagerRoute(this);
         dbManager.open();
         dbManagerPoint = new DatabaseManagerPoint(this);
@@ -348,6 +361,8 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        outState.putDouble("calories",this.calories);
+        outState.putFloat("distance",this.distance);
         mapView.onSaveInstanceState(outState);
     }
 
@@ -592,5 +607,17 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         return notifyBuilder;
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if(savedInstanceState.containsKey("calories")){
+            this.calories = savedInstanceState.getDouble("calories");
+            distanceValueView.setText(Math.round(this.distance*100)/100.0 + " m");
+            caloriesValueView.setText(Math.round(this.calories*100)/100.0 + " cal");
+        }
+        if(savedInstanceState.containsKey("distance")){
+            this.distance = savedInstanceState.getFloat("distance");
+            distanceValueView.setText(Math.round(this.distance*100)/100.0 + " m");
+        }
 
+    }
 }
