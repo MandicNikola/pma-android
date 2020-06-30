@@ -30,7 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
     Switch switchReminder;
     Switch switchSync;
     boolean reminder;
-    boolean sync;
+    boolean sync = false;
     Retrofit retrofit;
     private AuthPlaceholder service;
     private SharedPreferences preferences;
@@ -43,10 +43,19 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_settings);
+
+        switchReminder = (Switch) findViewById(R.id.reminder);
+        switchSync = (Switch) findViewById(R.id.sync);
+
         if (savedInstanceState != null) {
             userId = savedInstanceState.getInt("userId");
+            if(savedInstanceState.getBoolean("syncFlag")){
+                sync = true;
+            }
+            switchSync.setChecked(savedInstanceState.getBoolean("syncFlag"));
+
         }
-        setContentView(R.layout.activity_settings);
 
         retrofit = new Retrofit.Builder()
                 .baseUrl("https://pma-app-19.herokuapp.com/")
@@ -55,11 +64,12 @@ public class SettingsActivity extends AppCompatActivity {
         dbManager = new DatabaseManagerProfile(this);
         dbManager.open();
 
-        switchReminder = (Switch) findViewById(R.id.reminder);
-        switchSync = (Switch) findViewById(R.id.sync);
 
         service = retrofit.create(AuthPlaceholder.class);
         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
+        if(preferences.contains("syncFlag")){
+            switchSync.setChecked(preferences.getBoolean("syncFlag",false));
+        }
 
         if (preferences.contains("token")) {
             token = preferences.getString("token", null);
@@ -103,9 +113,11 @@ public class SettingsActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     // The toggle is enabled
+                    changeSync(true);
                     sync = true;
                 } else {
                     // The toggle is disabled
+                    changeSync(false);
                     sync = false;
                 }
             }
@@ -156,6 +168,9 @@ public class SettingsActivity extends AppCompatActivity {
         if(savedInstanceState.getBoolean("reminder")){
            switchReminder.setChecked(true);
        }
+        if(savedInstanceState.getBoolean("syncFlag")){
+            switchSync.setChecked(true);
+        }
         userId = savedInstanceState.getInt("userId");
         dbManager = new DatabaseManagerProfile(this);
         dbManager.open();
@@ -165,8 +180,15 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putBoolean("reminder",reminder);
+        savedInstanceState.putBoolean("syncFlag",sync);
         savedInstanceState.putInt("userId",userId);
         super.onSaveInstanceState(savedInstanceState);
     }
 
+    public void changeSync(boolean syncFlag){
+        preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("syncFlag", syncFlag);
+        editor.commit();
+    }
 }
