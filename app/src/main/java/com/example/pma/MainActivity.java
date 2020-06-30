@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter("alaram_received");
         registerReceiver(alarm_receiver, intentFilter);
 
-
         Intent notifyIntent = new Intent(this, WaterReceiver.class);
 
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
@@ -117,28 +116,6 @@ public class MainActivity extends AppCompatActivity {
                             }
                             if(response.code() == 200){
 
-                                Call<Profile> call2 = service.getProfile("Bearer "+token);
-                                call2.enqueue(new Callback<Profile>() {
-                                    @Override
-                                    public void onResponse(Call<Profile> call, Response<Profile> response) {
-                                        Log.d(TAG,"Code is "+response.code());
-                                        if (response.isSuccessful()) {
-                                            if(response.code() == 200){
-                                                SharedPreferences.Editor editor = preferences.edit();
-                                                if(response.body().isWaterReminder()){
-                                                    editor.putString("reminder", "true");
-                                                }else{
-                                                    editor.putString("reminder", "false");
-                                                }
-                                                editor.commit();
-                                            }
-                                        }
-                                    }
-                                    @Override
-                                    public void onFailure(Call<Profile> call, Throwable t) {
-                                        Log.d(TAG,"Unsuccessfull");
-                                    }
-                                });
                                 startActivity(new Intent(MainActivity.this, RouteActivity.class));
                             }
                         }
@@ -158,69 +135,73 @@ public class MainActivity extends AppCompatActivity {
     BroadcastReceiver alarm_receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
+            if(preferences.getBoolean("syncFlag",false)) {
+                Log.d(TAG, "sync on");
 
-            dbManager.open();
-            managerPoint.open();
-            routes = dbManager.getRoutes();
-             for(Route route:routes){
-                 if(route.getSynchronized_id() == -1){
-                     if(preferences.contains("token") ) {
-                         String token = preferences.getString("token",null);
+                dbManager.open();
+                managerPoint.open();
+                routes = dbManager.getRoutes();
+                for (Route route : routes) {
+                    if (route.getSynchronized_id() == -1) {
+                        if (preferences.contains("token")) {
+                            String token = preferences.getString("token", null);
 
-                         points = managerPoint.getRoutePoints(route.getId());
-                         HashMap<String, List<Double>> pointsMap = new HashMap<String, List<Double>>();
-                          for(Point point:points){
+                            points = managerPoint.getRoutePoints(route.getId());
+                            HashMap<String, List<Double>> pointsMap = new HashMap<String, List<Double>>();
+                            for (Point point : points) {
                                 List<Double> values = new ArrayList<>();
-                              String formattedDate = "";
-                              try {
-                                  Date date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(point.getDateTime());
-                                   formattedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(date);
+                                String formattedDate = "";
+                                try {
+                                    Date date = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(point.getDateTime());
+                                    formattedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(date);
 
-                              } catch (ParseException e) {
-                                  e.printStackTrace();
-                              }
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
 
-                              values.add(point.getLatitude());
-                              values.add(point.getLongitude());
-                              pointsMap.put(formattedDate,values);
+                                values.add(point.getLatitude());
+                                values.add(point.getLongitude());
+                                pointsMap.put(formattedDate, values);
 
-                          }
-                          String formattedDateEndRoute = "";
-                          String formattedDateStartRoute="";
-                          try{
-                         Date date = new SimpleDateFormat("yyyy-MM-dd").parse(route.getEnd_time());
-                         formattedDateEndRoute = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(date);
-                         date = new SimpleDateFormat("yyyy-MM-dd").parse(route.getStart_time());
-                         formattedDateStartRoute =  new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(date);
+                            }
+                            String formattedDateEndRoute = "";
+                            String formattedDateStartRoute = "";
+                            try {
+                                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(route.getEnd_time());
+                                formattedDateEndRoute = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(date);
+                                date = new SimpleDateFormat("yyyy-MM-dd").parse(route.getStart_time());
+                                formattedDateStartRoute = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS").format(date);
 
-                          }catch (ParseException e) {
-                            e.printStackTrace();
-                          }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
 
-                         RouteRequest routeRequest = new RouteRequest(formattedDateStartRoute,formattedDateEndRoute,pointsMap,route.getDistance());
-                         Call<RouteResponse> call = routeService.saveRoute(routeRequest,"Bearer "+token);
-                         call.enqueue(new Callback<RouteResponse>() {
-                         @Override
-                         public void onResponse(Call<RouteResponse> call, Response<RouteResponse> response) {
+                            RouteRequest routeRequest = new RouteRequest(formattedDateStartRoute, formattedDateEndRoute, pointsMap, route.getDistance());
+                            Call<RouteResponse> call = routeService.saveRoute(routeRequest, "Bearer " + token);
+                            call.enqueue(new Callback<RouteResponse>() {
+                                @Override
+                                public void onResponse(Call<RouteResponse> call, Response<RouteResponse> response) {
 
-                             if (response.isSuccessful()) {
-                                 if(response.code() == 200){
-                                     dbManager.updateSynchronized(route.getId(), response.body().getId());
-                                 }
-                             }
-                         }
-                         @Override
-                         public void onFailure(Call<RouteResponse> call, Throwable t) {
-                             Log.d(TAG," neuspesno");
+                                    if (response.isSuccessful()) {
+                                        if (response.code() == 200) {
+                                            dbManager.updateSynchronized(route.getId(), response.body().getId());
+                                        }
+                                    }
+                                }
 
-                         }
-                     });
+                                @Override
+                                public void onFailure(Call<RouteResponse> call, Throwable t) {
+                                    Log.d(TAG, " neuspesno");
+
+                                }
+                            });
 
 
+                        }
                     }
-                 }
-             }
-
+                }
+            }
 
         }
     };

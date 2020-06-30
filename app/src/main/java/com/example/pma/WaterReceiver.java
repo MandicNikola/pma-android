@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 
@@ -15,11 +17,19 @@ public class WaterReceiver extends BroadcastReceiver {
 
     private static final String PRIMARY_CHANNEL_ID =
             "primary_notification_channel";
+    private SharedPreferences preferences;
+    private static final String TAG = "WaterReciever";
+
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
         mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        deliverNotification(context);
+        preferences = context.getSharedPreferences("user_detail", Context.MODE_PRIVATE);
+        if(preferences.getBoolean("waterFlag",false)) {
+            Log.d(TAG, "water on");
+            deliverNotification(context);
+        }
     }
 
     public void deliverNotification(Context context) {

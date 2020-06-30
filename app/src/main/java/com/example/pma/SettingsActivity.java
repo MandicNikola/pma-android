@@ -59,6 +59,10 @@ public class SettingsActivity extends AppCompatActivity {
         }
         if(preferences.contains("waterFlag")){
             switchReminder.setChecked(preferences.getBoolean("waterFlag",false));
+        }else{
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean("waterFlag", reminder);
+            editor.commit();
         }
 
 
