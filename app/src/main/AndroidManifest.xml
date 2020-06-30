@@ -14,12 +14,16 @@
             android:label="My Profile"
             android:parentActivityName=".RouteActivity" />
 
-        <activity android:name=".ActiveRoute" />
+        <activity android:name=".ActiveRoute"
+            android:label="Active Route"
+            android:parentActivityName=".RouteActivity"/>
         <activity
             android:name=".CreateGoalActivity"
             android:label="New goal"
             android:parentActivityName=".GoalActivity" />
-        <activity android:name=".GoalActivity" />
+        <activity android:name=".GoalActivity"
+            android:label="My Goals"
+            android:parentActivityName=".RouteActivity"/>
         <activity
             android:name=".SettingsActivity"
             android:label="Settings"
