@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -135,7 +137,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
-            if(preferences.getBoolean("syncFlag",false)) {
+            Log.d(TAG, "Entered alarm_receiver");
+
+            if(preferences.getBoolean("syncFlag",false) && hasInternet()) {
                 Log.d(TAG, "sync on");
 
                 dbManager.open();
@@ -206,6 +210,29 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    public boolean hasInternet() {
+        Log.d(TAG, "In hasInternet");
+
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        boolean connected = false;
+        if(netInfo != null) {
+            if (netInfo.getType() == ConnectivityManager.TYPE_WIFI || netInfo.getType() == ConnectivityManager.TYPE_MOBILE) {
+                if (netInfo.isConnected()) {
+                    Log.d(TAG, "Internet connected");
+                    connected = true;
+                } else {
+                    Log.d(TAG, "Internet not connected 1");
+                }
+            }else{
+                Log.d(TAG, "Internet not connected 2");
+            }
+         }else{
+            Log.d(TAG, "No network");
+
+        }
+        return connected;
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
