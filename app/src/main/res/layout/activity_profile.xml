@@ -49,7 +49,8 @@
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
                     android:paddingBottom="5dp"
-                    android:text="@string/name" />
+                    android:text="@string/name"
+                    android:textSize="14sp" />
 
                 <EditText
                     android:id="@+id/name_data"
@@ -60,7 +61,8 @@
                     android:paddingLeft="5dp"
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="5dp"
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -78,7 +80,8 @@
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
                     android:paddingBottom="5dp"
-                    android:text="@string/surname" />
+                    android:text="@string/surname"
+                    android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/surname_data"
@@ -89,7 +92,8 @@
                     android:paddingLeft="5dp"
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="5dp"
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -107,7 +111,8 @@
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
                     android:paddingBottom="5dp"
-                    android:text="@string/mail" />
+                    android:text="@string/mail"
+                    android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/email_data"
@@ -118,7 +123,8 @@
                     android:paddingLeft="5dp"
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="5dp"
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -136,7 +142,8 @@
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
                     android:paddingBottom="5dp"
-                    android:text="@string/height" />
+                    android:text="@string/height"
+                    android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/height_data"
@@ -147,7 +154,8 @@
                     android:paddingLeft="5dp"
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="5dp"
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -165,7 +173,8 @@
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
                     android:paddingBottom="5dp"
-                    android:text="@string/weight" />
+                    android:text="@string/weight"
+                    android:textSize="16sp" />
 
                 <EditText
                     android:id="@+id/weight_data"
@@ -176,7 +185,8 @@
                     android:paddingLeft="5dp"
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
-                    android:paddingBottom="5dp" />
+                    android:paddingBottom="5dp"
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -194,7 +204,8 @@
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
                     android:paddingBottom="5dp"
-                    android:text="@string/gender" />
+                    android:text="@string/gender"
+                    android:textSize="16sp" />
 
                 <Spinner
                     android:id="@+id/gender_spinner"
