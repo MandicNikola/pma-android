@@ -84,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
         PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
                 (this, NOTIFICATION_ID, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        // TODO: Need to implement initialization using shared preferences for water reminder
          AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
 
         long repeatInterval = AlarmManager.INTERVAL_FIFTEEN_MINUTES;
@@ -178,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             RouteRequest routeRequest = new RouteRequest(formattedDateStartRoute, formattedDateEndRoute, pointsMap, route.getDistance());
+                            routeRequest.setCalories(route.getCalories());
                             Call<RouteResponse> call = routeService.saveRoute(routeRequest, "Bearer " + token);
                             call.enqueue(new Callback<RouteResponse>() {
                                 @Override

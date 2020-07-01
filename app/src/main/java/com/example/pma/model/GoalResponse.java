@@ -10,7 +10,7 @@ public class GoalResponse {
 
     private String goalKey;
 
-    private String date;
+    private String localDateTime;
 
     private Double currentValue;
 
@@ -28,7 +28,7 @@ public class GoalResponse {
         this.id = id;
         this.goalValue = goalValue;
         this.goalKey = goalKey;
-        this.date = date;
+        this.localDateTime = date;
     }
 
     public Long getId() {
@@ -55,11 +55,27 @@ public class GoalResponse {
         this.goalKey = goalKey;
     }
 
-    public String getDate() {
-        return date;
+    public String getLocalDateTime() {
+        return localDateTime;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setLocalDateTime(String localDateTime) {
+        this.localDateTime = localDateTime;
+    }
+
+    public Double getCurrentValue() {
+        return currentValue;
+    }
+
+    public void setCurrentValue(Double currentValue) {
+        this.currentValue = currentValue;
+    }
+
+    public int getNotified() {
+        return notified;
+    }
+
+    public void setNotified(int notified) {
+        this.notified = notified;
     }
 }

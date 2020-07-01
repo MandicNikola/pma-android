@@ -11,6 +11,7 @@ public class RouteRequest {
     private HashMap<String, List<Double>> points;
 
     private Double distance;
+    private Double calories;
     public RouteRequest(){
 
     }
@@ -52,5 +53,13 @@ public class RouteRequest {
 
     public void setDistance(Double distance) {
         this.distance = distance;
+    }
+
+    public Double getCalories() {
+        return calories;
+    }
+
+    public void setCalories(Double calories) {
+        this.calories = calories;
     }
 }

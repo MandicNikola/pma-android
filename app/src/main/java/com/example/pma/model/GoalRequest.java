@@ -10,6 +10,7 @@ public class GoalRequest {
 
     private double percentage;
 
+    private Double currentValue;
     public GoalRequest(){
     }
 
@@ -61,4 +62,11 @@ public class GoalRequest {
         this.goalValue = goalValue;
     }
 
+    public Double getCurrentValue() {
+        return currentValue;
+    }
+
+    public void setCurrentValue(Double currentValue) {
+        this.currentValue = currentValue;
+    }
 }

@@ -92,6 +92,7 @@ public class CreateGoalActivity extends AppCompatActivity {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Date parsedDate = simpleDateFormat.parse(date);
         GoalRequest goalReq = new GoalRequest(simpleDateFormat.format(parsedDate),key.toUpperCase(),value,(long)id,0);
+        goalReq.setCurrentValue(0.00);
         if(preferences.contains("token") ) {
             token = preferences.getString("token",null);
         }
