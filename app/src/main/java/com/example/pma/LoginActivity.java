@@ -223,7 +223,7 @@ public class LoginActivity extends AppCompatActivity {
                               key = "Calories";
                           }
 
-                           dbManagerGoal.insert(key,goal.getGoalValue(),goal.getLocalDateTime(),userId,goal.getCurrentValue();,goal.getNotified(),goal.getId());
+                           dbManagerGoal.insert(key,goal.getGoalValue(),goal.getLocalDateTime(),userId,goal.getCurrentValue(),goal.getNotified(),goal.getId());
                        }
                     }
                 }
