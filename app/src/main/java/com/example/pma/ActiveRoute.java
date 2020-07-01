@@ -113,6 +113,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     LocationCallback locationCallback;
 
     private Button finishButton;
+    private Button startButton;
     private static final String TAG = "ActiveRoute";
 
     // Notification variables
@@ -147,7 +148,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         if(savedInstanceState != null){
             if(savedInstanceState.containsKey("calories")){
                 this.calories = savedInstanceState.getDouble("calories");
-                distanceValueView.setText(Math.round(this.distance*100)/100.0 + " m");
                 caloriesValueView.setText(Math.round(this.calories*100)/100.0 + " cal");
             }
             if(savedInstanceState.containsKey("distance")){
@@ -167,6 +167,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         mapView.getMapAsync(this);
 
         finishButton = findViewById(R.id.finishBtn);
+        startButton = findViewById(R.id.startButton);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -363,6 +364,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         super.onSaveInstanceState(outState);
         outState.putDouble("calories",this.calories);
         outState.putFloat("distance",this.distance);
+        outState.putBoolean("startTracking",this.startTracking);
         mapView.onSaveInstanceState(outState);
     }
 
@@ -611,7 +613,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         if(savedInstanceState.containsKey("calories")){
             this.calories = savedInstanceState.getDouble("calories");
-            distanceValueView.setText(Math.round(this.distance*100)/100.0 + " m");
             caloriesValueView.setText(Math.round(this.calories*100)/100.0 + " cal");
         }
         if(savedInstanceState.containsKey("distance")){

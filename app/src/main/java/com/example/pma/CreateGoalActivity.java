@@ -41,17 +41,18 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class CreateGoalActivity extends AppCompatActivity {
     private Spinner spinner;
     private TextView dateTextView;
+    private EditText valueTextView;
     String[] spinner_array = { "Calories", "Distance"};
     private String date;
     private String key;
-    private int value;
+    private Double value;
     private DatabaseManagerGoal dbManager;
     private SharedPreferences preferences;
     Retrofit retrofit;
     private AuthPlaceholder service;
     private GoalPlaceholder goalService;
 
-
+    private  ArrayAdapter adapter;
     private int id;
     public static final String GOAL_RESULT = "GOAL_RESULT";
     private static final String TAG = "CreateGoalActivity1";
@@ -65,22 +66,40 @@ public class CreateGoalActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
+
         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
 
         spinner = (Spinner) findViewById(R.id.spinner);
-        ArrayAdapter adapter= new ArrayAdapter(this,android.R.layout.simple_spinner_item, spinner_array);
+         adapter= new ArrayAdapter(this,android.R.layout.simple_spinner_item, spinner_array);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         dateTextView = (TextView) findViewById(R.id.goal_date);
+
+        valueTextView = (EditText) findViewById(R.id.goal_value);
+        if(savedInstanceState != null){
+            if(savedInstanceState.containsKey("value")){
+                valueTextView.setText(savedInstanceState.getString("value"));
+            }
+            if(savedInstanceState.containsKey("key")){
+                int selectedPosition =  adapter.getPosition(savedInstanceState.get("key"));
+                spinner.setSelection(selectedPosition);
+
+            }
+            if(savedInstanceState.containsKey("date")){
+                dateTextView.setText(savedInstanceState.getString("date"));
+                this.date = savedInstanceState.getString("date");
+            }
+        }
         dbManager = new DatabaseManagerGoal(this);
         dbManager.open();
 
     }
     public void createGoal(View view) throws ParseException {
         EditText valueEditText = (EditText)findViewById(R.id.goal_value);
-        value = Integer.parseInt(valueEditText.getText().toString());
+        value = Double.parseDouble(valueEditText.getText().toString());
         key = (String) spinner.getSelectedItem();
         goalService = retrofit.create(GoalPlaceholder.class);
+        Log.d("bgt","datum je "+date);
         Date goalDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
         // TODO: Just add later id of goal not 1
         Goal goal = new Goal(Long.parseLong("1"), value, key, goalDate);
@@ -159,7 +178,44 @@ public class CreateGoalActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if(savedInstanceState.containsKey("value")){
+            EditText valueText = (EditText) findViewById(R.id.goal_value);
+            Double valueDouble = savedInstanceState.getDouble("value");
+            valueText.setText(valueDouble.toString());
+        }
+        if(savedInstanceState.containsKey("key")){
+            Spinner spinner = (Spinner) findViewById(R.id.spinner);
+           int selectedPosition =  adapter.getPosition(savedInstanceState.get("key"));
+           spinner.setSelection(selectedPosition);
 
+        }
+        if(savedInstanceState.containsKey("date")){
+            TextView dateText = (TextView) findViewById(R.id.goal_date);
+
+            dateText.setText(savedInstanceState.getString("date"));
+
+            this.date = savedInstanceState.getString("date");
+        }
+    }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        EditText valueEditText = (EditText)findViewById(R.id.goal_value);
+
+        Log.d("bgt ",""+valueEditText.getText().toString());
+        if(!valueEditText.getText().toString().isEmpty()) {
+            value = Double.parseDouble(valueEditText.getText().toString());
+        }else{
+            Log.d("bgt ","prazno");
+        }
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        key = (String) spinner.getSelectedItem();
+        savedInstanceState.putDouble("value",value);
+        savedInstanceState.putString("key",this.key);
+        savedInstanceState.putString("date",this.date);
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
     public void showDatapicker(View view) {
         DialogFragment newFragment = new DatePickerFragment();
