@@ -46,6 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
     private static final String TAG = "ProfileActivity";
     private String token = "";
     private Integer userId;
+    private ArrayAdapter adapterGender;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,7 +66,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         preferences = getSharedPreferences("user_detail", MODE_PRIVATE);
 
-        ArrayAdapter adapterGender= new ArrayAdapter(this,android.R.layout.simple_spinner_item, gender_array);
+        adapterGender= new ArrayAdapter(this,android.R.layout.simple_spinner_item, gender_array);
         adapterGender.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(adapterGender);
 
@@ -93,13 +94,15 @@ public class ProfileActivity extends AppCompatActivity {
                     Log.d(TAG,"Code is "+response.code());
                     if (response.isSuccessful()) {
                             if(response.code() == 200){
-                                editName.setText(response.body().getFirstname());
-                                editSurname.setText(response.body().getLastname());
-                                editEmail.setText(response.body().getEmail());
-                                editHeight.setText(String.valueOf(response.body().getHeight()));
-                                editWeight.setText(String.valueOf(response.body().getWeight()));
-                                int spinnerPosition = adapterGender.getPosition(response.body().getGender());
-                                spinnerGender.setSelection(spinnerPosition);
+                                if(savedInstanceState == null) {
+                                    editName.setText(response.body().getFirstname());
+                                    editSurname.setText(response.body().getLastname());
+                                    editEmail.setText(response.body().getEmail());
+                                    editHeight.setText(String.valueOf(response.body().getHeight()));
+                                    editWeight.setText(String.valueOf(response.body().getWeight()));
+                                    int spinnerPosition = adapterGender.getPosition(response.body().getGender());
+                                    spinnerGender.setSelection(spinnerPosition);
+                                }
                             }
                     }
                 }
@@ -111,17 +114,45 @@ public class ProfileActivity extends AppCompatActivity {
         }else{
             Log.d(TAG,"Token is not there");
         }
+        if(savedInstanceState != null) {
+            if(savedInstanceState.containsKey("name")){
+                ((EditText)findViewById(R.id.name_data)).setText(savedInstanceState.getString("name"));
+            }
+            if(savedInstanceState.containsKey("surname")){
+                ((EditText)findViewById(R.id.surname_data)).setText(savedInstanceState.getString("surname"));
+            }
+            if(savedInstanceState.containsKey("email")){
+                ((EditText)findViewById(R.id.email_data)).setText(savedInstanceState.getString("email"));
+            }
+            if(savedInstanceState.containsKey("height")){
+                ((EditText)findViewById(R.id.height_data)).setText(savedInstanceState.getString("height"));
+            }
+            if(savedInstanceState.containsKey("weight")){
+                ((EditText)findViewById(R.id.weight_data)).setText(savedInstanceState.getString("weight"));
+            }
+            if(savedInstanceState.containsKey("gender")){
+                int spinnerPosition = adapterGender.getPosition(savedInstanceState.getString("gender"));
+                spinnerGender.setSelection(spinnerPosition);
+            }
+        }
     }
     public void checkData(View view) {
         boolean valid = true;
         if(isEmpty(editName.getText().toString())){
             valid = false;
+            editName.setError("Name is required");
         }
         if(isEmpty(editSurname.getText().toString())) {
             valid = false;
+            editSurname.setError("Surname is required");
         }
-        if(isEmpty(editEmail.getText().toString()) || isEmail(editEmail.getText().toString()) == false) {
+        if(isEmpty(editEmail.getText().toString())){
             valid = false;
+            editEmail.setError("Email is required");
+        }
+        if( isEmail(editEmail.getText().toString()) == false) {
+            valid = false;
+            editEmail.setError("Email is not valid");
         }
         if(valid){
             if(!token.isEmpty()){
@@ -164,6 +195,65 @@ public class ProfileActivity extends AppCompatActivity {
     }
     public boolean isEmail(String text) {
         return (!TextUtils.isEmpty(text) && Patterns.EMAIL_ADDRESS.matcher(text).matches());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if(savedInstanceState.containsKey("name")){
+            Log.d("namee11", savedInstanceState.getString("name"));
+            ((EditText)findViewById(R.id.name_data)).setText(savedInstanceState.getString("name"));
+        }
+        if(savedInstanceState.containsKey("surname")){
+            Log.d("222", savedInstanceState.getString("surname"));
+
+            ((EditText)findViewById(R.id.surname_data)).setText(savedInstanceState.getString("surname"));
+        }
+        if(savedInstanceState.containsKey("email")){
+            Log.d("33333", savedInstanceState.getString("email"));
+            EditText emailText =  (EditText)findViewById(R.id.email_data);
+            emailText.setText(savedInstanceState.getString("email"));
+        }
+        if(savedInstanceState.containsKey("height")){
+            Log.d("4444444", savedInstanceState.getString("height"));
+
+            ((EditText)findViewById(R.id.height_data)).setText(savedInstanceState.getString("height"));
+        }
+        if(savedInstanceState.containsKey("weight")){
+            Log.d("5555555", savedInstanceState.getString("weight"));
+
+            ((EditText)findViewById(R.id.weight_data)).setText(savedInstanceState.getString("weight"));
+        }
+        if(savedInstanceState.containsKey("gender")){
+            Log.d("66666", savedInstanceState.getString("gender"));
+
+            int spinnerPosition = adapterGender.getPosition(savedInstanceState.getString("gender"));
+            spinnerGender.setSelection(spinnerPosition);
+        }
+    }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        String name = ((EditText)findViewById(R.id.name_data)).getText().toString();
+        Log.d("namee",name);
+        String surname = ((EditText)findViewById(R.id.surname_data)).getText().toString();
+        Log.d("surnamee",surname);
+        String email =  ((EditText)findViewById(R.id.email_data)).getText().toString();
+        Log.d("email", email);
+        String height = ((EditText)findViewById(R.id.height_data)).getText().toString();
+        Log.d("heeight",height);
+        String weight = ((EditText)findViewById(R.id.weight_data)).getText().toString();
+        Log.d("wewi",weight);
+        String gender = spinnerGender.getSelectedItem().toString();
+        Log.d("gender",gender);
+
+
+        savedInstanceState.putString("name", name);
+        savedInstanceState.putString("surname", surname);
+        savedInstanceState.putString("email", email);
+        savedInstanceState.putString("height", height);
+        savedInstanceState.putString("weight", weight);
+        savedInstanceState.putString("gender", gender);
+
+        super.onSaveInstanceState(savedInstanceState);
     }
 
 }

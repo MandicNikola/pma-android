@@ -90,8 +90,11 @@ public class LoginActivity extends AppCompatActivity {
         boolean correct = true;
             if(TextUtils.isEmpty(username)){
                 correct = false;
+                ((EditText) findViewById(R.id.username)).setError("Username is required");
+
             }
             if(TextUtils.isEmpty(password)){
+                ((EditText) findViewById(R.id.password)).setError("Password is required");
                 correct = false;
             }
             if(correct){

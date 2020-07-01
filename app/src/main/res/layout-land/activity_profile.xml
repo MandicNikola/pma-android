@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
     android:padding="20dp">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
@@ -49,19 +49,20 @@
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp"
-                android:text="@string/name" />
+                android:text="@string/name"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/name_data"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="185"
                 android:inputType="textPersonName"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
-                android:paddingBottom="5dp" />
+                android:paddingBottom="5dp"
+                android:textSize="16sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -79,19 +80,20 @@
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp"
-                android:text="@string/surname" />
+                android:text="@string/surname"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/surname_data"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="185"
                 android:inputType="textPersonName"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
-                android:paddingBottom="5dp" />
+                android:paddingBottom="5dp"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -109,19 +111,20 @@
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp"
-                android:text="@string/mail" />
+                android:text="@string/mail"
+                android:textSize="16sp"/>
 
             <EditText
                 android:id="@+id/email_data"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="185"
                 android:inputType="textPersonName"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
-                android:paddingBottom="5dp" />
+                android:paddingBottom="5dp"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -139,19 +142,20 @@
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp"
-                android:text="@string/height" />
+                android:text="@string/height"
+                android:textSize="16sp"/>
 
             <EditText
                 android:id="@+id/height_data"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="185"
                 android:inputType="textPersonName"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
-                android:paddingBottom="5dp" />
+                android:paddingBottom="5dp"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -169,19 +173,20 @@
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp"
-                android:text="@string/weight" />
+                android:text="@string/weight"
+                android:textSize="16sp"/>
 
             <EditText
                 android:id="@+id/weight_data"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="85"
                 android:inputType="textPersonName"
                 android:paddingLeft="5dp"
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
-                android:paddingBottom="5dp" />
+                android:paddingBottom="5dp"
+                android:textSize="16sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -199,7 +204,8 @@
                 android:paddingTop="5dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="5dp"
-                android:text="@string/gender" />
+                android:text="@string/gender"
+                android:textSize="16sp"/>
 
             <Spinner
                 android:id="@+id/gender_spinner"
