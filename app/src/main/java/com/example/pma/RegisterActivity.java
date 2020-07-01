@@ -196,9 +196,9 @@ public class RegisterActivity extends AppCompatActivity {
         String username = ((EditText)findViewById(R.id.username)).getText().toString();
         String password = ((EditText)findViewById(R.id.password)).getText().toString();
 
-        savedInstanceState.putString("name", username);
-        savedInstanceState.putString("surname", password);
-        savedInstanceState.putString("email", username);
+        savedInstanceState.putString("name", name);
+        savedInstanceState.putString("surname", surname);
+        savedInstanceState.putString("email", email);
         savedInstanceState.putString("username", username);
         savedInstanceState.putString("password", password);
 
