@@ -47,6 +47,24 @@ public class RegisterActivity extends AppCompatActivity {
                 .baseUrl("https://pma-app-19.herokuapp.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
+        if(savedInstanceState != null){
+            if(savedInstanceState.containsKey("name")){
+                ((EditText)findViewById(R.id.firstName)).setText(savedInstanceState.getString("name"));
+            }
+            if(savedInstanceState.containsKey("surname")){
+                ((EditText)findViewById(R.id.lastName)).setText(savedInstanceState.getString("surname"));
+            }
+            if(savedInstanceState.containsKey("email")){
+                ((EditText)findViewById(R.id.email)).setText(savedInstanceState.getString("email"));
+            }
+            if(savedInstanceState.containsKey("username")){
+                ((EditText)findViewById(R.id.username)).setText(savedInstanceState.getString("username"));
+            }
+            if(savedInstanceState.containsKey("password")){
+                ((EditText)findViewById(R.id.password)).setText(savedInstanceState.getString("password"));
+            }
+        }
+
 
     }
 
@@ -152,4 +170,39 @@ public class RegisterActivity extends AppCompatActivity {
         }
         return  false;
     }
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        if(savedInstanceState.containsKey("name")){
+            ((EditText)findViewById(R.id.firstName)).setText(savedInstanceState.getString("name"));
+        }
+        if(savedInstanceState.containsKey("surname")){
+            ((EditText)findViewById(R.id.lastName)).setText(savedInstanceState.getString("surname"));
+        }
+        if(savedInstanceState.containsKey("email")){
+            ((EditText)findViewById(R.id.email)).setText(savedInstanceState.getString("email"));
+        }
+        if(savedInstanceState.containsKey("username")){
+            ((EditText)findViewById(R.id.username)).setText(savedInstanceState.getString("username"));
+        }
+        if(savedInstanceState.containsKey("password")){
+            ((EditText)findViewById(R.id.password)).setText(savedInstanceState.getString("password"));
+        }
+    }
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        String name = ((EditText)findViewById(R.id.firstName)).getText().toString();
+        String surname = ((EditText)findViewById(R.id.lastName)).getText().toString();
+        String email =  ((EditText)findViewById(R.id.email)).getText().toString();
+        String username = ((EditText)findViewById(R.id.username)).getText().toString();
+        String password = ((EditText)findViewById(R.id.password)).getText().toString();
+
+        savedInstanceState.putString("name", username);
+        savedInstanceState.putString("surname", password);
+        savedInstanceState.putString("email", username);
+        savedInstanceState.putString("username", username);
+        savedInstanceState.putString("password", password);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
 }

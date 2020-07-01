@@ -75,8 +75,12 @@ public class LoginActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         if(savedInstanceState != null){
-            this.savedUsername = savedInstanceState.getString("savedUsername");
-
+            if(savedInstanceState.containsKey("username")){
+                ((EditText)findViewById(R.id.username)).setText(savedInstanceState.getString("username"));
+            }
+            if(savedInstanceState.containsKey("password")){
+                ((EditText)findViewById(R.id.password)).setText(savedInstanceState.getString("password"));
+            }
         }
 
     }
@@ -275,11 +279,22 @@ public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
-
+        if(savedInstanceState.containsKey("username")){
+            ((EditText)findViewById(R.id.username)).setText(savedInstanceState.getString("username"));
+        }
+        if(savedInstanceState.containsKey("password")){
+            ((EditText)findViewById(R.id.password)).setText(savedInstanceState.getString("password"));
+        }
     }
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
+        username = ((EditText)findViewById(R.id.username)).getText().toString();
+        password = ((EditText)findViewById(R.id.password)).getText().toString();
+
+        savedInstanceState.putString("username", username);
+        savedInstanceState.putString("password", password);
 
         super.onSaveInstanceState(savedInstanceState);
     }
+
 }
