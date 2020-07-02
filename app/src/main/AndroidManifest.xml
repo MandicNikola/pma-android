@@ -34,7 +34,7 @@
             android:parentActivityName=".RouteActivity" />
         <activity
             android:name=".RouteActivity"
-            android:label="@string/title_activity_route"
+            android:label="@string/my_routes"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity" />

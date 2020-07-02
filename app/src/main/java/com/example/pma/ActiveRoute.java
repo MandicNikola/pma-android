@@ -145,6 +145,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         distanceValueView.setText("0 m");
         caloriesValueView = (TextView)findViewById(R.id.calories_value);
         caloriesValueView.setText("0 cal");
+        finishButton = findViewById(R.id.finishBtn);
+        startButton = findViewById(R.id.startButton);
+
         if(savedInstanceState != null){
             if(savedInstanceState.containsKey("calories")){
                 this.calories = savedInstanceState.getDouble("calories");
@@ -154,7 +157,14 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 this.distance = savedInstanceState.getFloat("distance");
                 distanceValueView.setText(Math.round(this.distance*100)/100.0 + " m");
             }
-
+            if(savedInstanceState.containsKey("startTracking")){
+                if(savedInstanceState.getBoolean("startTracking")) {
+                    this.startTracking = true;
+                    startButton = (Button) findViewById(R.id.startButton);
+                    startButton.setVisibility(View.GONE);
+                    finishButton.setVisibility(View.VISIBLE);
+                }
+            }
 
 
         }
@@ -166,8 +176,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
 
-        finishButton = findViewById(R.id.finishBtn);
-        startButton = findViewById(R.id.startButton);
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -378,35 +386,38 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     protected void onDestroy() {
         super.onDestroy();
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-        if(startTracking){
-            Location firstLocation = (Location) locations.get(0);
-            Location lastLocation = (Location) locations.get(locations.size()-1);
-            Date start_date = new Date(firstLocation.getTime());
-            Date end_date = new Date(lastLocation.getTime());
+        if(startTracking) {
+            if (locations.size() != 0 ) {
+                Location firstLocation = (Location) locations.get(0);
+                Location lastLocation = (Location) locations.get(locations.size() - 1);
+                Date start_date = new Date(firstLocation.getTime());
+                Date end_date = new Date(lastLocation.getTime());
 
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-            String strDate1 = simpleDateFormat.format(start_date);
-            String strDate2 = simpleDateFormat.format(end_date);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                String strDate1 = simpleDateFormat.format(start_date);
+                String strDate2 = simpleDateFormat.format(end_date);
 
-            long id = -1;
-            id=dbManager.insert(this.calories,this.distance,"m",(long)-1,strDate1,strDate2);
-            for(int i = 0 ;i< locations.size();i++){
-                Location location = (Location) locations.get(i);
-                Date current_time = new Date(location.getTime());
-                String current_time_string = simpleDateFormat.format(current_time);
-                long idPoint = dbManagerPoint.insert((float)location.getLongitude(),(float)location.getLatitude(),id,current_time_string);
+                long id = -1;
+                id = dbManager.insert(this.calories, this.distance, "m", (long) -1, strDate1, strDate2);
+                for (int i = 0; i < locations.size(); i++) {
+                    Location location = (Location) locations.get(i);
+                    Date current_time = new Date(location.getTime());
+                    String current_time_string = simpleDateFormat.format(current_time);
+                    long idPoint = dbManagerPoint.insert((float) location.getLongitude(), (float) location.getLatitude(), id, current_time_string);
+                }
+                Date endDateRoute = null;
+                try {
+                    endDateRoute = new SimpleDateFormat("yyyy-MM-dd").parse(strDate1);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                updateGoal(endDateRoute);
+
+                startTracking = false;
             }
-            Date endDateRoute= null;
-            try {
-                endDateRoute = new SimpleDateFormat("yyyy-MM-dd").parse(strDate1);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            updateGoal(endDateRoute);
-
-            startTracking = false;
         }
-        mapView.onDestroy();
+            mapView.onDestroy();
+
     }
 
     public void onLocationChanged(Location location) {
@@ -618,6 +629,13 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         if(savedInstanceState.containsKey("distance")){
             this.distance = savedInstanceState.getFloat("distance");
             distanceValueView.setText(Math.round(this.distance*100)/100.0 + " m");
+        }
+        if(savedInstanceState.containsKey("startTracking")){
+            if(savedInstanceState.getBoolean("startTracking")) {
+                startButton = (Button) findViewById(R.id.startButton);
+                startButton.setVisibility(View.GONE);
+                finishButton.setVisibility(View.VISIBLE);
+            }
         }
 
     }
