@@ -101,7 +101,6 @@ public class CreateGoalActivity extends AppCompatActivity {
         goalService = retrofit.create(GoalPlaceholder.class);
         Log.d("bgt","datum je "+date);
         Date goalDate = new SimpleDateFormat("yyyy-MM-dd").parse(date);
-        // TODO: Just add later id of goal not 1
         Goal goal = new Goal(Long.parseLong("1"), value, key, goalDate);
         goal.setCurrentValue(0);
         String token = "";

@@ -79,7 +79,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     /** `array` of route points */
     private List points = new ArrayList<Point>();
-    // TODO: Use them for memorizing
     /** `array` list from locations, later use them for memorizing to DB */
     private List locations = new ArrayList<Location>();
 
@@ -94,7 +93,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     private TextView distanceValueView;
     private TextView caloriesValueView;
-    // TODO: Later when get user settings need to provide those values from DB
     private double height = 192;
     private double weight = 105;
     private String tokenUser = "";
@@ -226,7 +224,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
-        // TODO: Need to get userSettings because need for user weight and height
 
         // Initialization of notification channel
         createNotificationChannel();
@@ -463,30 +460,31 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     public void onFinishClick(View view) throws ParseException {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-        // TODO: Handle case when there's not locations
-        Location firstLocation = (Location) locations.get(0);
-        Location lastLocation = (Location) locations.get(locations.size()-1);
-        Date start_date = new Date(firstLocation.getTime());
-        Date end_date = new Date(lastLocation.getTime());
+        if (locations.size() != 0 ) {
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-        String strDate1 = simpleDateFormat.format(start_date);
-        String strDate2 = simpleDateFormat.format(end_date);
+            Location firstLocation = (Location) locations.get(0);
+            Location lastLocation = (Location) locations.get(locations.size() - 1);
+            Date start_date = new Date(firstLocation.getTime());
+            Date end_date = new Date(lastLocation.getTime());
 
-        // indicator for show notification
-        showNotification = false;
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+            String strDate1 = simpleDateFormat.format(start_date);
+            String strDate2 = simpleDateFormat.format(end_date);
 
-        long id = -1;
-        id=dbManager.insert(this.calories,this.distance,"m",(long)-1,strDate1,strDate2);
-        for(int i = 0 ;i< locations.size();i++){
-            Location location = (Location) locations.get(i);
-            Date current_time = new Date(location.getTime());
-            String current_time_string = simpleDateFormat.format(current_time);
-            long idPoint = dbManagerPoint.insert(location.getLongitude(), location.getLatitude(),id,current_time_string);
+            // indicator for show notification
+            showNotification = false;
+
+            long id = -1;
+            id = dbManager.insert(this.calories, this.distance, "m", (long) -1, strDate1, strDate2);
+            for (int i = 0; i < locations.size(); i++) {
+                Location location = (Location) locations.get(i);
+                Date current_time = new Date(location.getTime());
+                String current_time_string = simpleDateFormat.format(current_time);
+                long idPoint = dbManagerPoint.insert(location.getLongitude(), location.getLatitude(), id, current_time_string);
+            }
+            Date endDateRoute = new SimpleDateFormat("yyyy-MM-dd").parse(strDate1);
+            updateGoal(endDateRoute);
         }
-        Date endDateRoute=new SimpleDateFormat("yyyy-MM-dd").parse(strDate1);
-        updateGoal(endDateRoute);
-
         if(showNotification) {
             NotificationCompat.Builder notifyBuilder = getNotificationBuilder();
             mNotifyManager.notify(NOTIFICATION_ID, notifyBuilder.build());
