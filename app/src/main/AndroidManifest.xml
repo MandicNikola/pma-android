@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.pma">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/gwlogo"
@@ -9,25 +13,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".SettingActivity"></activity>
         <activity
             android:name=".ProfileActivity"
             android:label="My Profile"
             android:parentActivityName=".RouteActivity" />
-
-        <activity android:name=".ActiveRoute"
+        <activity
+            android:name=".ActiveRoute"
             android:label="Active Route"
-            android:parentActivityName=".RouteActivity"/>
+            android:parentActivityName=".RouteActivity" />
         <activity
             android:name=".CreateGoalActivity"
             android:label="New goal"
             android:parentActivityName=".GoalActivity" />
-        <activity android:name=".GoalActivity"
-            android:label="My Goals"
-            android:parentActivityName=".RouteActivity"/>
         <activity
-            android:name=".SettingsActivity"
-            android:label="Settings"
+            android:name=".GoalActivity"
+            android:label="My Goals"
             android:parentActivityName=".RouteActivity" />
+
         <activity
             android:name=".RouteDetail"
             android:label="Route detail"
@@ -45,6 +48,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
@@ -52,15 +56,10 @@
         <receiver
             android:name=".WaterReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
-        <receiver android:name=".sync.SyncReceiver"/>
-        <service android:name=".sync.SyncService"/>
+            android:exported="true" />
+        <receiver android:name=".sync.SyncReceiver" />
 
-
+        <service android:name=".sync.SyncService" />
     </application>
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
 </manifest>

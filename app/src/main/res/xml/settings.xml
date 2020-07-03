@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <SwitchPreferenceCompat
+        android:defaultValue="false"
+        android:key="keySync"
+        android:summary="Allow data synchronization with the server"
+        android:title="Synchronization of data"
+        android:icon="@drawable/sync32"
+/>
+    <SwitchPreferenceCompat
+        android:defaultValue="false"
+        android:key="keyReminder"
+        android:summary="Turn on reminder for drinking water"
+        android:title="Water reminder"
+
+        android:icon="@drawable/waterglass32"/>
+</PreferenceScreen>

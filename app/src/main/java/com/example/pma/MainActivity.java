@@ -76,6 +76,8 @@ public class MainActivity extends AppCompatActivity {
         managerPoint = new DatabaseManagerPoint(this);
         routeService = retrofit.create(RoutePlaceholder.class);
 
+
+
         RunService repeat = new RunService(this);
         repeat.call(120, true);
         IntentFilter intentFilter = new IntentFilter("alaram_received");

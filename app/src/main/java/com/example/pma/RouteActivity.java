@@ -1,5 +1,6 @@
 package com.example.pma;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -170,6 +171,8 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(RouteActivity.this, SettingActivity.class);
+            startActivity(intent);
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -192,7 +195,7 @@ public class RouteActivity extends AppCompatActivity    implements NavigationVie
         }
 
         if(id == R.id.nav_settings){
-            Intent intent = new Intent(RouteActivity.this, SettingsActivity.class);
+            Intent intent = new Intent(RouteActivity.this, SettingActivity.class);
             startActivity(intent);
         }
         if(id == R.id.nav_log_out){
