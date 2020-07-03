@@ -5,7 +5,7 @@
         android:key="keySync"
         android:summary="Allow data synchronization with the server"
         android:title="Synchronization of data"
-        android:icon="@drawable/sync32"
+        android:icon="@drawable/ic_sync_black_32dp"
 />
     <SwitchPreferenceCompat
         android:defaultValue="false"
