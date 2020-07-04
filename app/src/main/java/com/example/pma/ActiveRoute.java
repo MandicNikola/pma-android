@@ -79,8 +79,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     /** `array` of route points */
     private List points = new ArrayList<Point>();
-    /** `array` list from locations, later use them for memorizing to DB */
-    private List locations = new ArrayList<Location>();
+
+    /** `array` used to memorize locations  */
+    private ArrayList<com.example.pma.model.Point> parcPoints = new ArrayList<com.example.pma.model.Point>();
 
     // distance calculated for route
     private Float distance = 0f;
@@ -148,7 +149,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
         if(savedInstanceState != null){
             if(savedInstanceState.containsKey("calories")){
-                this.calories = savedInstanceState.getDouble("calories");
+                this.calories = savedInstanceState.getDouble("calories", 0);
                 caloriesValueView.setText(Math.round(this.calories*100)/100.0 + " cal");
             }
             if(savedInstanceState.containsKey("distance")){
@@ -164,7 +165,12 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                 }
             }
 
-
+            if(savedInstanceState.containsKey("locations")) {
+                parcPoints = savedInstanceState.getParcelableArrayList("locations");
+                for(com.example.pma.model.Point point: parcPoints) {
+                    points.add(Point.fromLngLat(point.getLongitude(), point.getLatitude()));
+                }
+            }
         }
         dbManager = new DatabaseManagerRoute(this);
         dbManager.open();
@@ -188,7 +194,11 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 super.onLocationResult(locationResult);
-                onLocationChanged(locationResult.getLastLocation());
+                try {
+                    onLocationChanged(locationResult.getLastLocation());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
         };
 
@@ -224,7 +234,6 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
-
         // Initialization of notification channel
         createNotificationChannel();
     }
@@ -232,6 +241,12 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         this.mapboxMap = mapboxMap;
+
+        if(parcPoints.size() > 0) {
+            com.example.pma.model.Point point = parcPoints.get(parcPoints.size() - 1);
+            lat = point.getLatitude();
+            lng = point.getLongitude();
+        }
 
         double initLat = lat != null ? lat : 45.2671;
         double initLng = lng != null ? lng : 19.83;
@@ -258,9 +273,14 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
             // marker init flow
             style.addImage(DOT_SOURCE_ID, BitmapFactory.decodeResource(getResources(), R.drawable.blue_marker));
 
-            List<Feature> iconFeatureList = new ArrayList<>();
-
-            style.addSource(new GeoJsonSource("dot-source", FeatureCollection.fromFeatures(iconFeatureList)));
+            // case when we have points so render last on as marker
+            if(parcPoints.size() > 0) {
+                com.example.pma.model.Point point = parcPoints.get(parcPoints.size() - 1);
+                style.addSource(new GeoJsonSource("dot-source", Feature.fromGeometry(Point.fromLngLat(point.getLongitude(), point.getLatitude()))));
+            } else {
+                List<Feature> iconFeatureList = new ArrayList<>();
+                style.addSource(new GeoJsonSource("dot-source", FeatureCollection.fromFeatures(iconFeatureList)));
+            }
 
             style.addLayer(new SymbolLayer("dot-layer", "dot-source")
                 .withProperties(
@@ -294,7 +314,11 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
                     @Override
                     public void onLocationResult(LocationResult locationResult) {
                         super.onLocationResult(locationResult);
-                        onLocationChanged(locationResult.getLastLocation());
+                        try {
+                            onLocationChanged(locationResult.getLastLocation());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     }
                 };
 
@@ -319,25 +343,33 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-    private void calculateValues(Location location) {
+    private void calculateValues(Location location) throws ParseException {
         Double lat = location.getLatitude();
         Double lng = location.getLongitude();
-        if(locations.size() >= 1) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        if(parcPoints.size() >= 1) {
             // get last point
-            Location previousLocation = (Location) locations.get(locations.size() - 1);
+            com.example.pma.model.Point previousLocation = (com.example.pma.model.Point) parcPoints.get(parcPoints.size() - 1);
             float[] calculatedDistance = new float[2];
 
             Location.distanceBetween(lat, lng, previousLocation.getLatitude(), previousLocation.getLongitude(), calculatedDistance);
             this.distance += calculatedDistance[0];
-            float timeDifference = ((location.getTime() - previousLocation.getTime()) / 1000);
+            float timeDifference = (((location.getTime())- previousLocation.getTime())) / 1000;
             float speed = calculatedDistance[0] / timeDifference;
-            this.calories += ((0.035 * weight) + (Math.pow(speed, 2) / height)*(0.029 * weight)) * (timeDifference / 60);
-            // used this to round numbers of this
-            distanceValueView.setText(Math.round(this.distance*100)/100.0 + " m");
-            caloriesValueView.setText(Math.round(this.calories*100)/100.0 + " cal");
+            // handle case where speed may be `NaN`
+            if(!Float.isNaN(speed)) {
+                this.calories += ((0.035 * weight) + (Math.pow(speed, 2) / height)*(0.029 * weight)) * (timeDifference / 60);
+                distanceValueView.setText(Math.round(this.distance*100)/100.0 + " m");
+                caloriesValueView.setText(Math.round(this.calories*100)/100.0 + " cal");
+            }
         }
-
-        locations.add(location);
+        // adding parc point
+        com.example.pma.model.Point point = new com.example.pma.model.Point();
+        point.setLatitude(location.getLatitude());
+        point.setLongitude(location.getLongitude());
+        point.setDateTime(simpleDateFormat.format(new Date(location.getTime())));
+        point.setTime(location.getTime());
+        parcPoints.add(point);
     }
 
     @Override
@@ -370,6 +402,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         outState.putDouble("calories",this.calories);
         outState.putFloat("distance",this.distance);
         outState.putBoolean("startTracking",this.startTracking);
+
+        outState.putParcelableArrayList("locations", parcPoints);
+
         mapView.onSaveInstanceState(outState);
     }
 
@@ -383,41 +418,10 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     protected void onDestroy() {
         super.onDestroy();
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-        if(startTracking) {
-            if (locations.size() != 0 ) {
-                Location firstLocation = (Location) locations.get(0);
-                Location lastLocation = (Location) locations.get(locations.size() - 1);
-                Date start_date = new Date(firstLocation.getTime());
-                Date end_date = new Date(lastLocation.getTime());
-
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                String strDate1 = simpleDateFormat.format(start_date);
-                String strDate2 = simpleDateFormat.format(end_date);
-
-                long id = -1;
-                id = dbManager.insert(this.calories, this.distance, "m", (long) -1, strDate1, strDate2);
-                for (int i = 0; i < locations.size(); i++) {
-                    Location location = (Location) locations.get(i);
-                    Date current_time = new Date(location.getTime());
-                    String current_time_string = simpleDateFormat.format(current_time);
-                    long idPoint = dbManagerPoint.insert((float) location.getLongitude(), (float) location.getLatitude(), id, current_time_string);
-                }
-                Date endDateRoute = null;
-                try {
-                    endDateRoute = new SimpleDateFormat("yyyy-MM-dd").parse(strDate1);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                updateGoal(endDateRoute);
-
-                startTracking = false;
-            }
-        }
-            mapView.onDestroy();
-
+        mapView.onDestroy();
     }
 
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(Location location) throws ParseException {
         if(location != null) {
             this.lat = location.getLatitude();
             this.lng = location.getLongitude();
@@ -460,14 +464,16 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
     public void onFinishClick(View view) throws ParseException {
         fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-        if (locations.size() != 0 ) {
+        if (parcPoints.size() != 0 ) {
 
-            Location firstLocation = (Location) locations.get(0);
-            Location lastLocation = (Location) locations.get(locations.size() - 1);
-            Date start_date = new Date(firstLocation.getTime());
-            Date end_date = new Date(lastLocation.getTime());
+            com.example.pma.model.Point firstLocation = (com.example.pma.model.Point) parcPoints.get(0);
+            com.example.pma.model.Point lastLocation = (com.example.pma.model.Point) parcPoints.get(parcPoints.size() - 1);
 
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
+            Date start_date = simpleDateFormat.parse(firstLocation.getDateTime());
+            Date end_date = simpleDateFormat.parse(lastLocation.getDateTime());
+
             String strDate1 = simpleDateFormat.format(start_date);
             String strDate2 = simpleDateFormat.format(end_date);
 
@@ -476,9 +482,9 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
             long id = -1;
             id = dbManager.insert(this.calories, this.distance, "m", (long) -1, strDate1, strDate2);
-            for (int i = 0; i < locations.size(); i++) {
-                Location location = (Location) locations.get(i);
-                Date current_time = new Date(location.getTime());
+            for (int i = 0; i < parcPoints.size(); i++) {
+                com.example.pma.model.Point location = (com.example.pma.model.Point) parcPoints.get(i);
+                Date current_time = simpleDateFormat.parse(location.getDateTime());
                 String current_time_string = simpleDateFormat.format(current_time);
                 long idPoint = dbManagerPoint.insert(location.getLongitude(), location.getLatitude(), id, current_time_string);
             }
@@ -492,7 +498,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
 
         Intent intent = new Intent(this, RouteActivity.class);
         startActivity(intent);
-
+        finish();
     }
     public void updateGoal(Date endDateRoute){
         ArrayList<Goal> goals = new ArrayList<>();
@@ -621,7 +627,7 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         if(savedInstanceState.containsKey("calories")){
-            this.calories = savedInstanceState.getDouble("calories");
+            this.calories = savedInstanceState.getDouble("calories", 0);
             caloriesValueView.setText(Math.round(this.calories*100)/100.0 + " cal");
         }
         if(savedInstanceState.containsKey("distance")){
@@ -630,9 +636,18 @@ public class ActiveRoute extends AppCompatActivity implements OnMapReadyCallback
         }
         if(savedInstanceState.containsKey("startTracking")){
             if(savedInstanceState.getBoolean("startTracking")) {
+                this.startTracking = true;
                 startButton = (Button) findViewById(R.id.startButton);
                 startButton.setVisibility(View.GONE);
                 finishButton.setVisibility(View.VISIBLE);
+            }
+        }
+        if(savedInstanceState.containsKey("locations")) {
+            if(savedInstanceState.containsKey("locations")) {
+                parcPoints = savedInstanceState.getParcelableArrayList("locations");
+                for(com.example.pma.model.Point point: parcPoints) {
+                    points.add(Point.fromLngLat(point.getLongitude(), point.getLatitude()));
+                }
             }
         }
 

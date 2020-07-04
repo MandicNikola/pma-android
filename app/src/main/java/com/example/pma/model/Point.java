@@ -1,14 +1,20 @@
 package com.example.pma.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-public class Point  implements  Comparable<Point>{
+public class Point  implements  Comparable<Point>, Parcelable {
     private long id;
     private double longitude;
     private double latitude;
     private long route_id;
     private String dateTime;
+
+    // used for parceable to get
+    private Long time;
 
     public  Point(){
         super();
@@ -18,6 +24,21 @@ public class Point  implements  Comparable<Point>{
         this.longitude = longitude;
         this.latitude = latitude;
         this.route_id = route_id;
+    }
+
+    Point(Parcel in) {
+        longitude = in.readDouble();
+        latitude = in.readDouble();
+        dateTime = in.readString();
+        time = in.readLong();
+    }
+
+    public Long getTime() {
+        return time;
+    }
+
+    public void setTime(Long time) {
+        this.time = time;
     }
 
     public long getId() {
@@ -71,4 +92,27 @@ public class Point  implements  Comparable<Point>{
         }
         return 0;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(longitude);
+        dest.writeDouble(latitude);
+        dest.writeString(dateTime);
+        dest.writeLong(time);
+    }
+
+    public static final Parcelable.Creator<Point> CREATOR = new Parcelable.Creator<Point>() {
+        public Point createFromParcel(Parcel in) {
+            return new Point(in);
+        }
+
+        public Point[] newArray(int size) {
+            return new Point[size];
+        }
+    };
 }
